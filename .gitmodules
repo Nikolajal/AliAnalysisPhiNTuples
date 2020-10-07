@@ -1,0 +1,3 @@
+[submodule "AliAnalysisTaskPhiCount"]
+	path = AliAnalysisTaskPhiCount
+	url = https://github.com/Nikolajal/AliAnalysisTaskPhiCount.git
