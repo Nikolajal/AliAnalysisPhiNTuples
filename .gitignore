@@ -21,3 +21,4 @@ result/*
 *.jpg
 *.ps
 *.eps
+.DS_Store
