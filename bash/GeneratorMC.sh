@@ -2,7 +2,7 @@ mkdir -p ./exe
 
 if [ `hostname` == "bownalice07.bo.infn.it" ]; then
 
-    g++ ./root/GeneratorMC.C \
+    g++ ./src/GeneratorMC.C \
 	-o ./exe/GeneratorMC \
 	-std=c++11 \
 	-lpythia8 \
@@ -15,7 +15,7 @@ if [ `hostname` == "bownalice07.bo.infn.it" ]; then
 else
   
     g++ -g -Wall `root-config --cflags --libs` \
-    ./root/Anls_MonteCarloGenerator.C \
+    ./src/Anls_MonteCarloGenerator.C \
     -lpythia8 \
     -L/Applications/pythia8303/lib\
     -I/Applications/pythia8303/include\

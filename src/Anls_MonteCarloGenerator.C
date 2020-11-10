@@ -21,12 +21,13 @@ int main (int argc, char *argv[])
     TFile * outFile     = new   TFile   (Form("%s.root",argv[1]),   "recreate", "", 101);
     
     //Initialisation of TTree
-    TTree * fPhiCandidate,  * fPhiEfficiency,   * fKaonCandidate;
+    TTree * fPhiCandidate,  * fPhiEfficiency,   * fKaonCandidate,   * fKaonEfficiency;
     
     // Define tree data structures
     Struct_PhiCandidate     evPhiCandidate;
     Struct_PhiEfficiency    evPhiEfficiency;
     Struct_KaonCandidate    evKaonCandidate;
+    Struct_PhiEfficiency    evKaonEfficiency;
     
     // PhiCandidate Tree Set-Up
     fPhiCandidate = new TTree   ("PhiCandidate",    "Data Tree for Phi Candidates");
@@ -58,6 +59,14 @@ int main (int argc, char *argv[])
     fPhiEfficiency->Branch      ("Pz",              &evPhiEfficiency.Pz,            "Pz[nPhi]/F");
     fPhiEfficiency->Branch      ("Selection",       &evPhiEfficiency.Selection,     "Selection[nPhi]/b");
     
+    // KaonEfficiency Tree Set-Up
+    fKaonEfficiency = new TTree ("KaonEfficiency",  "MC Tree for Kaon Efficiency");
+    fKaonEfficiency->Branch     ("nPhi",            &evKaonEfficiency.nPhi,         "nPhi/b");
+    fKaonEfficiency->Branch     ("Px",              &evKaonEfficiency.Px,           "Px[nPhi]/F");
+    fKaonEfficiency->Branch     ("Py",              &evKaonEfficiency.Py,           "Py[nPhi]/F");
+    fKaonEfficiency->Branch     ("Pz",              &evKaonEfficiency.Pz,           "Pz[nPhi]/F");
+    fKaonEfficiency->Branch     ("Selection",       &evKaonEfficiency.Selection,    "Selection[nPhi]/b");
+    
     // PYTHIA INITIALISATION
     Pythia8::Pythia pythia;
     
@@ -84,6 +93,7 @@ int main (int argc, char *argv[])
         evPhiCandidate.nPhi     =   0;
         evPhiEfficiency.nPhi    =   0;
         evKaonCandidate.nKaon   =   0;
+        evKaonEfficiency.nPhi   =   0;
         
         // Starting cycling through event particles
         for ( int iParticle = 0; iParticle < pythia.event.size() ; iParticle++ )
@@ -141,6 +151,13 @@ int main (int argc, char *argv[])
             // Storing Kaons
             if ( fabs(Current_Particle.id()) == 321 )
             {
+                evKaonEfficiency.Px[evKaonEfficiency.nPhi]          =   Current_Particle.px();
+                evKaonEfficiency.Py[evKaonEfficiency.nPhi]          =   Current_Particle.py();
+                evKaonEfficiency.Pz[evKaonEfficiency.nPhi]          =   Current_Particle.pz();
+                evKaonEfficiency.Selection[evKaonEfficiency.nPhi]   =   0;
+                
+                if ((fabs(Current_Particle.eta()) < 0.8) && (Current_Particle.pT() > 0.15))
+                    evKaonEfficiency.Selection[evKaonEfficiency.nPhi] += 2;
                 /*
                 evKaon.ID       [evKaon.nKaon]  =   iParticle;
                 evKaon.bRec     [evKaon.nKaon]  =   (fabs(particle.eta()) < 0.8) && (particle.pT() > 0.15);
@@ -148,6 +165,8 @@ int main (int argc, char *argv[])
                 evKaon.Mom2     [evKaon.nKaon]  =   particle.mother2();
                 evKaon.nKaon++;
                  */
+                
+                evKaonEfficiency.nPhi++;
             }
             /*
         }
@@ -200,13 +219,15 @@ int main (int argc, char *argv[])
             }
              */
         }
-        fKaonCandidate  ->Fill();
         fPhiCandidate   ->Fill();
         fPhiEfficiency  ->Fill();
+        fKaonCandidate  ->Fill();
+        fKaonEfficiency ->Fill();
     }
-    fKaonCandidate  ->Write();
     fPhiCandidate   ->Write();
     fPhiEfficiency  ->Write();
+    fKaonCandidate  ->Write();
+    fKaonEfficiency ->Write();
     
     outFile     ->Close();
     return 0;
