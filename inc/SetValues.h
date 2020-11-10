@@ -27,6 +27,7 @@
 
 // ROOT // I/O
 #include "TFile.h"
+#include "TRandom.h"
 
 using namespace std;
 
@@ -173,23 +174,23 @@ const   Float_t   fMaxPT2D  = 10.0;
 // DATA Structures
 typedef struct
 {
-    Int_t nKaon, ID[1024], Mom1[1024], Mom2[1024];
-    Bool_t  bRec [1024];
-} EVKAON;
+    UChar_t nPhi,           iKaon[1024],    jKaon[1024];
+    Float_t Multiplicity,   Px[1024],       Py[1024],       Pz[1024],   InvMass[1024];
+} Struct_PhiCandidate;
 
 typedef struct
 {
-    Int_t   nKaonCouple, nMultipl, iKaon[1024], jKaon[1024];
-    Bool_t  bPhi[1024], bRec[1024], bEta[1024];
-    Float_t InvMass[1024], pT[1024];
-} EVKAONCOUPLE;
+    UChar_t nKaon,          Charge[1024];
+    Char_t  SigmaTOF[1024], SigmaTPC[1024];
+    Float_t Multiplicity,   Px[1024],       Py[1024],       Pz[1024],   InvMass[1024];
+} Struct_KaonCandidate;
 
 typedef struct
 {
-    Int_t   nPhi, nMultipl, Dau1[1024], Dau2[1024], ID[1024];
-    Bool_t  bRec[1024], bEta[1024], bKdc[1024];
-    Float_t pT[1024];
-} EVPHI;
+    UChar_t nPhi,           Selection[1024];
+    Float_t Multiplicity,   Px[1024],       Py[1024],       Pz[1024],   InvMass[1024];
+    Bool_t  fGen;
+} Struct_PhiEfficiency;
 
 //------------------------------//
 //    VARIABLES UTILITIES       //
