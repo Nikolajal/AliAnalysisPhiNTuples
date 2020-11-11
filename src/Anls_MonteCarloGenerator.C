@@ -27,7 +27,7 @@ int main (int argc, char *argv[])
     Struct_PhiCandidate     evPhiCandidate;
     Struct_PhiEfficiency    evPhiEfficiency;
     Struct_KaonCandidate    evKaonCandidate;
-    Struct_PhiEfficiency    evKaonEfficiency;
+    Struct_KaonEfficiency   evKaonEfficiency;
     
     // PhiCandidate Tree Set-Up
     fPhiCandidate = new TTree   ("PhiCandidate",    "Data Tree for Phi Candidates");
@@ -61,11 +61,12 @@ int main (int argc, char *argv[])
     
     // KaonEfficiency Tree Set-Up
     fKaonEfficiency = new TTree ("KaonEfficiency",  "MC Tree for Kaon Efficiency");
-    fKaonEfficiency->Branch     ("nPhi",            &evKaonEfficiency.nPhi,         "nPhi/b");
-    fKaonEfficiency->Branch     ("Px",              &evKaonEfficiency.Px,           "Px[nPhi]/F");
-    fKaonEfficiency->Branch     ("Py",              &evKaonEfficiency.Py,           "Py[nPhi]/F");
-    fKaonEfficiency->Branch     ("Pz",              &evKaonEfficiency.Pz,           "Pz[nPhi]/F");
-    fKaonEfficiency->Branch     ("Selection",       &evKaonEfficiency.Selection,    "Selection[nPhi]/b");
+    fKaonEfficiency->Branch     ("nKaon",           &evKaonEfficiency.nKaon,        "nKaon/b");
+    fKaonEfficiency->Branch     ("Px",              &evKaonEfficiency.Px,           "Px[nKaon]/F");
+    fKaonEfficiency->Branch     ("Py",              &evKaonEfficiency.Py,           "Py[nKaon]/F");
+    fKaonEfficiency->Branch     ("Pz",              &evKaonEfficiency.Pz,           "Pz[nKaon]/F");
+    fKaonCandidate->Branch      ("Charge",          &evKaonEfficiency.Charge,       "Charge[nKaon]/B");
+    fKaonEfficiency->Branch     ("Selection",       &evKaonEfficiency.Selection,    "Selection[nKaon]/b");
     
     // PYTHIA INITIALISATION
     Pythia8::Pythia pythia;
@@ -83,6 +84,9 @@ int main (int argc, char *argv[])
     //int nKaon, nPhi, nRecMistake, kaonID[1024], phiID[1024], phiRec[1024], RecMistake[1024];
     //bool kaonRec[1024];
     
+    // Utility variables
+    TLorentzVector  iKaon_p,    jKaon_p,    Phi_p;
+    
     // Cycling through events
     for ( int iEvent = 0; iEvent < nEvents; iEvent++ )
     {
@@ -93,7 +97,7 @@ int main (int argc, char *argv[])
         evPhiCandidate.nPhi     =   0;
         evPhiEfficiency.nPhi    =   0;
         evKaonCandidate.nKaon   =   0;
-        evKaonEfficiency.nPhi   =   0;
+        evKaonEfficiency.nKaon  =   0;
         
         // Starting cycling through event particles
         for ( int iParticle = 0; iParticle < pythia.event.size() ; iParticle++ )
@@ -109,19 +113,21 @@ int main (int argc, char *argv[])
                 evPhiEfficiency.Pz[evPhiEfficiency.nPhi]        =   Current_Particle.pz();
                 evPhiEfficiency.Selection[evPhiEfficiency.nPhi] =   0;
                 
-                
                 auto const Dau1                                 =   ( pythia.event[Current_Particle.daughter1()] );
                 auto const Dau2                                 =   ( pythia.event[Current_Particle.daughter2()] );
                 
                 if  ( ( Current_Particle.daughterList().size() == 2 ) &&
                      ( Dau1.id() == -Dau2.id() ) &&
-                     ( abs(Dau1.id()) == 321 ) )                evPhiEfficiency.Selection[evPhiEfficiency.nPhi]++;
+                     ( abs(Dau1.id()) == 321 ) )
+                    evPhiEfficiency.Selection[evPhiEfficiency.nPhi]++;
                 
                 if  ( evPhiEfficiency.Selection[evPhiEfficiency.nPhi] == 1 &&
                      ( fabs(Dau1.eta()) < 0.8 ) &&
                      ( fabs(Dau2.eta()) < 0.8 ) &&
                      ( Dau1.pT() > 0.15 ) &&
-                     ( Dau2.pT() > 0.15 ) )                     evPhiEfficiency.Selection[evPhiEfficiency.nPhi]++;
+                     ( Dau2.pT() > 0.15 ) )
+                    evPhiEfficiency.Selection[evPhiEfficiency.nPhi]++;
+                
                 /*
                 evPhi.ID        [evPhi.nPhi]    =   iParticle;
                 evPhi.bEta      [evPhi.nPhi]    =   (fabs(particle.p().rap()) <= 0.5);
@@ -151,13 +157,21 @@ int main (int argc, char *argv[])
             // Storing Kaons
             if ( fabs(Current_Particle.id()) == 321 )
             {
-                evKaonEfficiency.Px[evKaonEfficiency.nPhi]          =   Current_Particle.px();
-                evKaonEfficiency.Py[evKaonEfficiency.nPhi]          =   Current_Particle.py();
-                evKaonEfficiency.Pz[evKaonEfficiency.nPhi]          =   Current_Particle.pz();
-                evKaonEfficiency.Selection[evKaonEfficiency.nPhi]   =   0;
+                if ( !((fabs(Current_Particle.eta()) < 0.8) && (Current_Particle.pT() > 0.15)) ) continue;
+                evKaonEfficiency.Px[evKaonEfficiency.nKaon]         =   Current_Particle.px();
+                evKaonEfficiency.Py[evKaonEfficiency.nKaon]         =   Current_Particle.py();
+                evKaonEfficiency.Pz[evKaonEfficiency.nKaon]         =   Current_Particle.pz();
+                evKaonEfficiency.Charge[evKaonEfficiency.nKaon]     =   Current_Particle.charge();
+                evKaonEfficiency.Selection[evKaonEfficiency.nKaon]  =   0;
                 
-                if ((fabs(Current_Particle.eta()) < 0.8) && (Current_Particle.pT() > 0.15))
-                    evKaonEfficiency.Selection[evKaonEfficiency.nPhi] += 2;
+                // VV DA IMPLEMENTARE VV
+                /*
+                if ( ( evKaon.Mom1[iKaon] == evKaon.Mom1[jKaon] ) &&
+                    ( evKaon.Mom2[iKaon] == evKaon.Mom2[jKaon] ) &&
+                    ( pythia.event[evKaon.Mom1[iKaon]]).id() == 333 ) &&
+                    ( evKaon.Mom2[iKaon] == 0 ) )
+                    evKaonEfficiency.Selection[evKaonEfficiency.nKaon]++;
+                */
                 /*
                 evKaon.ID       [evKaon.nKaon]  =   iParticle;
                 evKaon.bRec     [evKaon.nKaon]  =   (fabs(particle.eta()) < 0.8) && (particle.pT() > 0.15);
@@ -166,58 +180,37 @@ int main (int argc, char *argv[])
                 evKaon.nKaon++;
                  */
                 
-                evKaonEfficiency.nPhi++;
+                evKaonEfficiency.nKaon++;
             }
-            /*
         }
         
         // Cycling through Kaons found
-        for ( int iKaon = 0; iKaon < evKaon.nKaon; iKaon++ )
+        for ( int iKaon = 0; iKaon < evKaonEfficiency.nKaon; iKaon++ )
         {
-            // Recovering the Kaon
-            const auto Kaon1 = pythia.event[evKaon.ID[iKaon]];
+            // Storing first Kaon kinematics and sign
+            iKaon_p.SetXYZM(evKaonEfficiency.Px[iKaon],evKaonEfficiency.Py[iKaon],evKaonEfficiency.Pz[iKaon],.493677);
             
-            for ( int jKaon = (iKaon+1); jKaon < evKaon.nKaon; jKaon++ )
+            for ( int jKaon = (iKaon+1); jKaon < evKaonEfficiency.nKaon; jKaon++ )
             {
-                // Recovering the Kaon
-                const auto Kaon2 = pythia.event[evKaon.ID[jKaon]];
+                // Storing first Kaon kinematics and sign
+                jKaon_p.SetXYZM(evKaonEfficiency.Px[iKaon],evKaonEfficiency.Py[iKaon],evKaonEfficiency.Pz[iKaon],.493677);
+                
+                /* No same sign*/
+                
+                /* No out of region candidates*/
                 
                 // Building the candidate Phi
-                const auto pPhi = Kaon1.p() + Kaon2.p();
+                Phi_p   =   iKaon_p +   jKaon_p;
                 
-                //Cut on Invariant Mass not in resonance region
-                if (pPhi.mCalc() < fMinIMMC) continue;
-                if (pPhi.mCalc() > fMaxIMMC) continue;
+                evPhiCandidate.Px[evPhiCandidate.nPhi]      =   Phi_p.Px();
+                evPhiCandidate.Py[evPhiCandidate.nPhi]      =   Phi_p.Py();
+                evPhiCandidate.Pz[evPhiCandidate.nPhi]      =   Phi_p.Pz();
+                evPhiCandidate.InvMass[evPhiCandidate.nPhi] =   Phi_p.Mag();
+                evPhiCandidate.iKaon[evPhiCandidate.nPhi]   =   iKaon;
+                evPhiCandidate.jKaon[evPhiCandidate.nPhi]   =   jKaon;
                 
-                // Unlike Sign ( Sig + Bkg )
-                if ( Kaon1.id() == -Kaon2.id() )
-                {
-                    evKaonSig.InvMass[evKaonSig.nKaonCouple]    =   pPhi.mCalc();
-                    evKaonSig.pT[evKaonSig.nKaonCouple]         =   pPhi.pT();
-                    evKaonSig.bRec[evKaonSig.nKaonCouple]       =   ( evKaon.bRec[iKaon] && evKaon.bRec[jKaon] );
-                    evKaonSig.bEta[evKaonSig.nKaonCouple]       =   ( fabs(pPhi.rap()) <= 0.5 );
-                    evKaonSig.iKaon[evKaonSig.nKaonCouple]      =   iKaon;
-                    evKaonSig.jKaon[evKaonSig.nKaonCouple]      =   jKaon;
-                    
-                    evKaonSig.bPhi[evKaonSig.nKaonCouple]       =   ( evKaon.Mom1[iKaon] == evKaon.Mom1[jKaon] &&
-                                                                     evKaon.Mom2[iKaon] == evKaon.Mom2[jKaon] &&
-                                                                     ( pythia.event[evKaon.Mom1[iKaon]]).id() == 333 &&
-                                                                     evKaon.Mom2[iKaon] == 0);
-                    evKaonSig.nKaonCouple++;
-                }
-                
-                // Like Sign ( Bkg )
-                if ( Kaon1.id() == Kaon2.id() )
-                {
-                    if (evKaon.bRec[iKaon] && evKaon.bRec[jKaon]) continue;
-                    if (fabs(pPhi.rap()) <= 0.5) continue;
-                    evKaonBkg.InvMass[evKaonBkg.nKaonCouple]   =    pPhi.mCalc();
-                    evKaonBkg.pT[evKaonBkg.nKaonCouple]        =    pPhi.pT();
-                    evKaonBkg.nKaonCouple++;
-                }
-             
+                evPhiCandidate.nPhi++;
             }
-             */
         }
         fPhiCandidate   ->Fill();
         fPhiEfficiency  ->Fill();

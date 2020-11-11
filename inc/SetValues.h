@@ -13,6 +13,7 @@
 
 // ROOT // Trees
 #include "TTree.h"
+#include "TLorentzVector.h"
 
 // ROOT // Histograms
 #include "TH1F.h"
@@ -189,8 +190,15 @@ typedef struct
 {
     UChar_t nPhi,           Selection[1024];
     Float_t Multiplicity,   Px[1024],       Py[1024],       Pz[1024],   InvMass[1024];
-    Bool_t  fGen;
+    Bool_t  fTru,           fGen,           fRec;
 } Struct_PhiEfficiency;
+
+typedef struct
+{
+    UChar_t nKaon,          Charge[1024],   Selection[1024];
+    Float_t Multiplicity,   Px[1024],       Py[1024],       Pz[1024],   InvMass[1024];
+    Bool_t  ftru;
+} Struct_KaonEfficiency;
 
 //------------------------------//
 //    VARIABLES UTILITIES       //
