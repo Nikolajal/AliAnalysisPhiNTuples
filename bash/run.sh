@@ -1,12 +1,12 @@
 #! /bin/bash
 
 ./bash/GeneratorMC.sh
-mkdir result || exit 1
+mkdir Pythia8_genev || exit 1
 
 strun=0
 nruns=1000
 njobs=16
-nevents=100000
+nevents=10000
 
 for run in $(seq $strun $(($strun + $nruns - 1))); do
 
@@ -16,18 +16,18 @@ for run in $(seq $strun $(($strun + $nruns - 1))); do
         if [ $bkgjobs -lt $njobs ]; then
             break
         fi
-        echo "[---] sleep while waiting for a free job slot"
-        sleep 60
+        echo "[INFO] Sleep while waiting for a free job slot"
+        sleep 10
     done
     
     runid=$(printf "%05d" $run)
     seed=$((123456789 + $run * 2))
     
-    echo "[---] starting run: $runid"
+    echo "[INFO] Starting run: $runid"
 
-    ./exe/GeneratorMC result/outGeneratorMC_$runid.root $nevents >& /dev/null && \
-	./dropbox_uploader.sh upload result/outGeneratorMC_$runid.root Rubini/. && \
-	rm -rf result/outGeneratorMC_$runid.root & 
+    ./exe/Anls_MonteCarloGenerator Pythia8_genev/outGeneratorMC_$runid $nevents >& /dev/null & #&& \
+	#./dropbox_uploader.sh upload result/outGeneratorMC_$runid.root Rubini/. && \
+	#rm -rf result/outGeneratorMC_$runid.root &
 
     sleep 1s
 
