@@ -22,7 +22,6 @@ void Anls_DataPreProcessing ( const char * fFileName )
     }
         
     // Define some simple data structures to Set Branch Addresses
-    // Kaon +- Couples B + S
     EVKAONCOUPLE        evKaonSig;
     if ( bPythiaTest == false )
     {

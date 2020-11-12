@@ -172,34 +172,6 @@ const   Float_t   fMinPT2D  = 0.0;
 const   Float_t   fMaxPT2D  = 10.0;
         Float_t * fArrPT2D  = new Float_t [nBinPT2D+1];
 
-// DATA Structures
-typedef struct
-{
-    UChar_t nPhi,           iKaon[1024],    jKaon[1024];
-    Float_t Multiplicity,   Px[1024],       Py[1024],       Pz[1024],   InvMass[1024];
-} Struct_PhiCandidate;
-
-typedef struct
-{
-    UChar_t nKaon,          Charge[1024];
-    Char_t  SigmaTOF[1024], SigmaTPC[1024];
-    Float_t Multiplicity,   Px[1024],       Py[1024],       Pz[1024],   InvMass[1024];
-} Struct_KaonCandidate;
-
-typedef struct
-{
-    UChar_t nPhi,           Selection[1024];
-    Float_t Multiplicity,   Px[1024],       Py[1024],       Pz[1024],   InvMass[1024];
-    Bool_t  fTru,           fGen,           fRec;
-} Struct_PhiEfficiency;
-
-typedef struct
-{
-    UChar_t nKaon,          Charge[1024],   Selection[1024];
-    Float_t Multiplicity,   Px[1024],       Py[1024],       Pz[1024],   InvMass[1024];
-    Bool_t  ftru;
-} Struct_KaonEfficiency;
-
 //------------------------------//
 //    VARIABLES UTILITIES       //
 //------------------------------//

@@ -30,7 +30,7 @@ int main (int argc, char *argv[])
     Struct_KaonEfficiency   evKaonEfficiency;
     
     // PhiCandidate Tree Set-Up
-    fPhiCandidate = new TTree   ("PhiCandidate",    "Data Tree for Phi Candidates");
+    fPhiCandidate = new TTree   (fPhiCandidate_Tree,"Data Tree for Phi Candidates");
     fPhiCandidate->Branch       ("Multiplicity",    &evPhiCandidate.Multiplicity,   "Multiplicity/F");
     fPhiCandidate->Branch       ("nPhi",            &evPhiCandidate.nPhi,           "nPhi/b");
     fPhiCandidate->Branch       ("Px",              &evPhiCandidate.Px,             "Px[nPhi]/F");
@@ -41,7 +41,7 @@ int main (int argc, char *argv[])
     fPhiCandidate->Branch       ("jKaon",           &evPhiCandidate.jKaon,          "jKaon[nPhi]/b");
     
     // KaonCandidate Tree Set-Up
-    fKaonCandidate = new TTree  ("KaonCandidate",   "Data Tree for Kaon Candidates");
+    fKaonCandidate = new TTree  (fKaon_Tree,        "Data Tree for Kaon Candidates");
     fKaonCandidate->Branch      ("Multiplicity",    &evKaonCandidate.Multiplicity,  "Multiplicity/F");
     fKaonCandidate->Branch      ("nKaon",           &evKaonCandidate.nKaon,         "nKaon/b");
     fKaonCandidate->Branch      ("Px",              &evKaonCandidate.Px,            "Px[nKaon]/F");
@@ -52,7 +52,7 @@ int main (int argc, char *argv[])
     fKaonCandidate->Branch      ("TPCSigma",        &evKaonCandidate.SigmaTPC,      "TPCSigma[nKaon]/B");
     
     // PhiEfficiency Tree Set-Up
-    fPhiEfficiency = new TTree  ("PhiEfficiency",   "MC Tree for Phi Efficiency");
+    fPhiEfficiency = new TTree  (fPhiCandidateEff_Tree, "MC Tree for Phi Efficiency");
     fPhiEfficiency->Branch      ("nPhi",            &evPhiEfficiency.nPhi,          "nPhi/b");
     fPhiEfficiency->Branch      ("Px",              &evPhiEfficiency.Px,            "Px[nPhi]/F");
     fPhiEfficiency->Branch      ("Py",              &evPhiEfficiency.Py,            "Py[nPhi]/F");
@@ -60,7 +60,7 @@ int main (int argc, char *argv[])
     fPhiEfficiency->Branch      ("Selection",       &evPhiEfficiency.Selection,     "Selection[nPhi]/b");
     
     // KaonEfficiency Tree Set-Up
-    fKaonEfficiency = new TTree ("KaonEfficiency",  "MC Tree for Kaon Efficiency");
+    fKaonEfficiency = new TTree (fKaonEff_Tree,     "MC Tree for Kaon Efficiency");
     fKaonEfficiency->Branch     ("nKaon",           &evKaonEfficiency.nKaon,        "nKaon/b");
     fKaonEfficiency->Branch     ("Px",              &evKaonEfficiency.Px,           "Px[nKaon]/F");
     fKaonEfficiency->Branch     ("Py",              &evKaonEfficiency.Py,           "Py[nKaon]/F");
