@@ -1,5 +1,5 @@
-#include "../inc/SetValues.h"
-// !TODO: Rebooting the selection process
+#include "../inc/AliAnalysisPhiPair.h"
+// !TODO: [WIP]
 
 void Anls_DataPreProcessing ( const char * fFileName )
 {
@@ -10,12 +10,13 @@ void Anls_DataPreProcessing ( const char * fFileName )
     }
     
     //Retrieving Event data
-    TFile *insFileDT     =   new TFile   (fFileName);
+    TFile *insFileDT        =   new TFile   (fFileName);
     
     //Retrieving Event data TTree
-    TTree *PTreeKSig    =   (TTree*)insFileDT->Get(fTreeSigName);
+    TTree   *TPhiCandidate  =   (TTree*)insFileDT->Get(fPhiCandidate_Tree);
+    TTree   *TKaon          =   (TTree*)insFileDT->Get(fKaon_Tree);
     
-    if ( !PTreeKSig )
+    if ( ! )
     {
         cout << "Input Data Tree not found!" << endl;
         return;
@@ -23,6 +24,9 @@ void Anls_DataPreProcessing ( const char * fFileName )
         
     // Define some simple data structures to Set Branch Addresses
     EVKAONCOUPLE        evKaonSig;
+    TPhiCandidate
+    
+    
     if ( bPythiaTest == false )
     {
         PTreeKSig  ->SetBranchAddress    ("nKaonCouple",   &evKaonSig.nKaonCouple);

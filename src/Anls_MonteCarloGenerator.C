@@ -1,4 +1,5 @@
 #include "../inc/SetValues.h"
+#include "../inc/AliAnalysisPhiPair.h"
 // !TODO: All set!
 
 // Pythia
@@ -163,6 +164,9 @@ int main (int argc, char *argv[])
                 evKaonEfficiency.Pz[evKaonEfficiency.nKaon]         =   Current_Particle.pz();
                 evKaonEfficiency.Charge[evKaonEfficiency.nKaon]     =   Current_Particle.charge();
                 evKaonEfficiency.Selection[evKaonEfficiency.nKaon]  =   0;
+    
+                if ( !((fabs(Current_Particle.eta()) < 0.8) && (Current_Particle.pT() > 0.15)) )
+                    evKaonEfficiency.Selection[evKaonEfficiency.nKaon]++;
                 
                 // VV DA IMPLEMENTARE VV
                 /*
@@ -190,22 +194,29 @@ int main (int argc, char *argv[])
             // Storing first Kaon kinematics and sign
             iKaon_p.SetXYZM(evKaonEfficiency.Px[iKaon],evKaonEfficiency.Py[iKaon],evKaonEfficiency.Pz[iKaon],.493677);
             
+            evKaonCandidate.Px[evKaonCandidate.nKaon]         =   evKaonEfficiency.Px[iKaon];
+            evKaonCandidate.Py[evKaonCandidate.nKaon]         =   evKaonEfficiency.Py[iKaon];
+            evKaonCandidate.Pz[evKaonCandidate.nKaon]         =   evKaonEfficiency.Pz[iKaon];
+            evKaonCandidate.Charge[evKaonCandidate.nKaon]     =   evKaonEfficiency.Charge[iKaon];
+        
+            evKaonCandidate.nKaon++;
+            
             for ( int jKaon = (iKaon+1); jKaon < evKaonEfficiency.nKaon; jKaon++ )
             {
                 // Storing first Kaon kinematics and sign
-                jKaon_p.SetXYZM(evKaonEfficiency.Px[iKaon],evKaonEfficiency.Py[iKaon],evKaonEfficiency.Pz[iKaon],.493677);
+                jKaon_p.SetXYZM(evKaonEfficiency.Px[jKaon],evKaonEfficiency.Py[jKaon],evKaonEfficiency.Pz[jKaon],.493677);
                 
-                /* No same sign*/
-                
-                /* No out of region candidates*/
+                // Exclude same sig Kaons
+                if ( evKaonEfficiency.Charge[iKaon] == evKaonEfficiency.Charge[jKaon] ) continue;
                 
                 // Building the candidate Phi
-                Phi_p   =   iKaon_p +   jKaon_p;
+                Phi_p   =   ( iKaon_p + jKaon_p );
                 
+                // Setting the Tree entry
                 evPhiCandidate.Px[evPhiCandidate.nPhi]      =   Phi_p.Px();
                 evPhiCandidate.Py[evPhiCandidate.nPhi]      =   Phi_p.Py();
                 evPhiCandidate.Pz[evPhiCandidate.nPhi]      =   Phi_p.Pz();
-                evPhiCandidate.InvMass[evPhiCandidate.nPhi] =   Phi_p.Mag();
+                evPhiCandidate.InvMass[evPhiCandidate.nPhi] =   (Phi_p).Mag();
                 evPhiCandidate.iKaon[evPhiCandidate.nPhi]   =   iKaon;
                 evPhiCandidate.jKaon[evPhiCandidate.nPhi]   =   jKaon;
                 
