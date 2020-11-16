@@ -30,9 +30,7 @@ void Anls_PreProcessing_MonteCarlo ( const char * fFileName )
     */
     
     // Define tree data structures
-    Struct_PhiCandidate     evPhiCandidate;
     Struct_PhiEfficiency    evPhiEfficiency;
-    Struct_KaonCandidate    evKaonCandidate;
     Struct_KaonEfficiency   evKaonEfficiency;
     
     TPhiCandidate-> SetBranchAddress    ("Multiplicity",    &evPhiCandidate.Multiplicity);

@@ -31,9 +31,7 @@ void Anls_PreProcessing_Data ( string fFileName = "" )
     
     // Define tree data structures
     Struct_PhiCandidate     evPhiCandidate;
-    Struct_PhiEfficiency    evPhiEfficiency;
     Struct_KaonCandidate    evKaonCandidate;
-    Struct_KaonEfficiency   evKaonEfficiency;
     
     TPhiCandidate-> SetBranchAddress    ("Multiplicity",    &evPhiCandidate.Multiplicity);
     TPhiCandidate-> SetBranchAddress    ("nPhi",            &evPhiCandidate.nPhi);
