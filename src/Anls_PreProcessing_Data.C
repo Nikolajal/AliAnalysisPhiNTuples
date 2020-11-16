@@ -1,54 +1,57 @@
 #include "../inc/AliAnalysisPhiPair.h"
-// !TODO: [WIP]
+// !TODO: [INFO] About trees in input
 
-void Anls_DataPreProcessing ( const char * fFileName )
+void Anls_PreProcessing_Data ( string fFileName = "" )
 {
-    if ( !fFileName )
+    if ( fFileName == "" )
     {
-        cout << "Must Specify an input root file" << endl;
+        cout << "[WARNING] Must Specify an input root file" << endl;
+        cout << "[INFP] Usage Anls_PreProcessing_Data(\"Root_file_name.root\")" << endl;
         return;
     }
     
     //Retrieving Event data
-    TFile *insFileDT        =   new TFile   (fFileName);
+    TFile *insFileDT        =   new TFile   (fFileName.c_str());
     
     //Retrieving Event data TTree
-    TTree   *TPhiCandidate  =   (TTree*)insFileDT->Get(fPhiCandidate_Tree);
-    TTree   *TKaon          =   (TTree*)insFileDT->Get(fKaon_Tree);
+    TTree   *TPhiCandidate  =   (TTree*)insFileDT->Get(fPhiCandidateEff_Tree);
+    TTree   *TKaonCandidate =   (TTree*)insFileDT->Get(fKaon_Tree);
     
-    if ( ! )
+    if ( !TPhiCandidate && !TKaonCandidate )
     {
         cout << "Input Data Tree not found!" << endl;
         return;
     }
-        
-    // Define some simple data structures to Set Branch Addresses
-    EVKAONCOUPLE        evKaonSig;
-    TPhiCandidate
-    
-    
-    if ( bPythiaTest == false )
+    /*
+    if ( !TPhiCandidate )
     {
-        PTreeKSig  ->SetBranchAddress    ("nKaonCouple",   &evKaonSig.nKaonCouple);
-        PTreeKSig  ->SetBranchAddress    ("iKaon",         &evKaonSig.iKaon);
-        PTreeKSig  ->SetBranchAddress    ("jKaon",         &evKaonSig.jKaon);
-        PTreeKSig  ->SetBranchAddress    ("bPhi",          &evKaonSig.bPhi);
-        PTreeKSig  ->SetBranchAddress    ("bRec",          &evKaonSig.bRec);
-        PTreeKSig  ->SetBranchAddress    ("bEta",          &evKaonSig.bEta);
-        PTreeKSig  ->SetBranchAddress    ("InvMass",       &evKaonSig.InvMass);
-        PTreeKSig  ->SetBranchAddress    ("pT",            &evKaonSig.pT);
+        cout << "[INFO] " << endl;
     }
-    else
-    {
-        PTreeKSig  ->SetBranchAddress    ("evKaonCouple.nKaonCouple",   &evKaonSig.nKaonCouple);
-        PTreeKSig  ->SetBranchAddress    ("evKaonCouple.iKaon",         &evKaonSig.iKaon);
-        PTreeKSig  ->SetBranchAddress    ("evKaonCouple.jKaon",         &evKaonSig.jKaon);
-        PTreeKSig  ->SetBranchAddress    ("evKaonCouple.bPhi",          &evKaonSig.bPhi);
-        PTreeKSig  ->SetBranchAddress    ("evKaonCouple.bRec",          &evKaonSig.bRec);
-        PTreeKSig  ->SetBranchAddress    ("evKaonCouple.bEta",          &evKaonSig.bEta);
-        PTreeKSig  ->SetBranchAddress    ("evKaonCouple.InvMass",       &evKaonSig.InvMass);
-        PTreeKSig  ->SetBranchAddress    ("evKaonCouple.pT",            &evKaonSig.pT);
-    }
+    */
+    
+    // Define tree data structures
+    Struct_PhiCandidate     evPhiCandidate;
+    Struct_PhiEfficiency    evPhiEfficiency;
+    Struct_KaonCandidate    evKaonCandidate;
+    Struct_KaonEfficiency   evKaonEfficiency;
+    
+    TPhiCandidate-> SetBranchAddress    ("Multiplicity",    &evPhiCandidate.Multiplicity);
+    TPhiCandidate-> SetBranchAddress    ("nPhi",            &evPhiCandidate.nPhi);
+    TPhiCandidate-> SetBranchAddress    ("Px",              &evPhiCandidate.Px);
+    TPhiCandidate-> SetBranchAddress    ("Py",              &evPhiCandidate.Py);
+    TPhiCandidate-> SetBranchAddress    ("Pz",              &evPhiCandidate.Pz);
+    TPhiCandidate-> SetBranchAddress    ("InvMass",         &evPhiCandidate.InvMass);
+    TPhiCandidate-> SetBranchAddress    ("iKaon",           &evPhiCandidate.iKaon);
+    TPhiCandidate-> SetBranchAddress    ("jKaon",           &evPhiCandidate.jKaon);
+    
+    TKaonCandidate-> SetBranchAddress   ("Multiplicity",    &evKaonCandidate.Multiplicity);
+    TKaonCandidate-> SetBranchAddress   ("nKaon",           &evKaonCandidate.nKaon);
+    TKaonCandidate-> SetBranchAddress   ("Px",              &evKaonCandidate.Px);
+    TKaonCandidate-> SetBranchAddress   ("Py",              &evKaonCandidate.Py);
+    TKaonCandidate-> SetBranchAddress   ("Pz",              &evKaonCandidate.Pz);
+    TKaonCandidate-> SetBranchAddress   ("Charge",          &evKaonCandidate.Charge);
+    TKaonCandidate-> SetBranchAddress   ("TOFSigma",        &evKaonCandidate.SigmaTOF);
+    TKaonCandidate-> SetBranchAddress   ("TPCSigma",        &evKaonCandidate.SigmaTPC);
     
     //---------------------//
     //  Setting up output  //
@@ -59,48 +62,45 @@ void Anls_DataPreProcessing ( const char * fFileName )
     fSetBinIM1D();
     fSetBinPT2D();
     fSetBinIM2D();
-    Int_t       S_ArrpT[1024];
+    Int_t       U_AccCand[1024];
+    Int_t       U_nAccept;
     
     // Creating the histograms-------------------------------------------------------------------------------
     // 1D
-    TH1F **     hIM_1D_Rec_PT_B_S               = new TH1F *    [nBinPT1D];
+    TH1F      **hREC_1D_in_PT               = new TH1F     *[nBinPT1D];
+    TH1F       *hREC_1D_in_Rap;
     
     // 2D
-    TH1F **     hIM_2D_Rec_PT_B_S               = new TH1F *    [nBinPT2D];
-    TH2F ***    hIM_2D_Rec_PT_PT_BB_BS_SB_SS    = new TH2F **   [nBinPT2D];
+    TH1F      **hREC_1D_in_PT_2D_bin        = new TH1F     *[nBinPT2D];
+    TH2F     ***hREC_2D_in_PT               = new TH2F    **[nBinPT2D];
+    
+    hName = "hREC_1D_in_Rap";
+    hTitle= "Rapidity difference for #phi meson candidates";
+    hREC_1D_in_Rap  =   new TH1F (hName,hTitle,100,-1.,1.);
     
     for ( Int_t iHisto = 0; iHisto < nBinPT1D; iHisto++ )
     {
-        hName = Form("hIM_1D_Rec_PT_B_S_%i",iHisto);
+        hName = Form("hREC_1D_in_PT_%i",iHisto);
         hTitle= Form("m_{K^{+}K^{-}} in p_{T} range [%.1f-%.1f] GeV/c",fArrPT1D[iHisto],fArrPT1D[iHisto+1]);
-        hIM_1D_Rec_PT_B_S[iHisto]   = new TH1F (hName,hTitle,nBinIM1D,fArrIM1D);
-        hIM_1D_Rec_PT_B_S[iHisto]   ->GetXaxis()->SetTitle("m_{K^{+}K^{-}} (GeV/c^{2})");
-        hIM_1D_Rec_PT_B_S[iHisto]   ->GetYaxis()->SetTitle("Entries");
-        hIM_1D_Rec_PT_B_S[iHisto]   ->GetXaxis()->SetTitleOffset(1.15);
-        hIM_1D_Rec_PT_B_S[iHisto]   ->GetYaxis()->SetTitleOffset(1.15);
+        hREC_1D_in_PT[iHisto]   = new TH1F (hName,hTitle,nBinIM1D,fArrIM1D);
+        SetAxis(hREC_1D_in_PT[iHisto],"IM 1D");
     }
     
     for ( Int_t iHisto = 0; iHisto < nBinPT2D; iHisto++ )
     {
-        hName = Form("hIM_2D_Rec_PT_B_S_%i",iHisto);
+        hName = Form("hREC_1D_in_PT_2D_bin_%i",iHisto);
         hTitle= Form("m_{K^{+}K^{-}} in p_{T} range [%.1f-%.1f] GeV/c",fArrPT2D[iHisto],fArrPT2D[iHisto+1]);
-        hIM_2D_Rec_PT_B_S[iHisto]   = new TH1F (hName,hTitle,nBinIM1D,fArrIM1D);
-        hIM_2D_Rec_PT_B_S[iHisto]   ->GetXaxis()->SetTitle("m_{K^{+}K^{-}} (GeV/c^{2})");
-        hIM_2D_Rec_PT_B_S[iHisto]   ->GetYaxis()->SetTitle("Entries");
-        hIM_2D_Rec_PT_B_S[iHisto]   ->GetXaxis()->SetTitleOffset(1.15);
-        hIM_2D_Rec_PT_B_S[iHisto]   ->GetYaxis()->SetTitleOffset(1.15);
+        hREC_1D_in_PT_2D_bin[iHisto]   = new TH1F (hName,hTitle,nBinIM1D,fArrIM1D);
+        SetAxis(hREC_1D_in_PT_2D_bin[iHisto],"IM 1D");
         
-        hIM_2D_Rec_PT_PT_BB_BS_SB_SS[iHisto]    = new TH2F *    [nBinPT2D];
+        hREC_2D_in_PT[iHisto]    = new TH2F *    [nBinPT2D];
         
         for ( Int_t jHisto = 0; jHisto < nBinPT2D; jHisto++ )
         {
-            hName = Form("hIM_2D_Rec_PT_PT_BB_BS_SB_SS_%i_%i",iHisto,jHisto);
+            hName = Form("hREC_2D_in_PT_%i_%i",iHisto,jHisto);
             hTitle= Form("m_{K^{+}K^{-}} in p_{T} range [%.1f-%.1f] GeV/c and [%.1f-%.1f] GeV/c",fArrPT2D[iHisto],fArrPT2D[iHisto+1],fArrPT2D[jHisto],fArrPT2D[jHisto+1]);
-            hIM_2D_Rec_PT_PT_BB_BS_SB_SS[iHisto][jHisto]    = new TH2F (hName,hTitle,nBinIM2D,fArrIM2D,nBinIM2D,fArrIM2D);
-            hIM_2D_Rec_PT_PT_BB_BS_SB_SS[iHisto][jHisto]    ->GetXaxis()->SetTitle(Form("m_{K^{+}K^{-}} (GeV/c^{2}) in p_{T} [%.1f-%.1f] GeV/c",fArrPT2D[iHisto],fArrPT2D[iHisto+1]));
-            hIM_2D_Rec_PT_PT_BB_BS_SB_SS[iHisto][jHisto]    ->GetYaxis()->SetTitle(Form("m_{K^{+}K^{-}} (GeV/c^{2}) in p_{T} [%.1f-%.1f] GeV/c",fArrPT2D[jHisto],fArrPT2D[jHisto+1]));
-            hIM_2D_Rec_PT_PT_BB_BS_SB_SS[iHisto][jHisto]    ->GetXaxis()->SetTitleOffset(1.5);
-            hIM_2D_Rec_PT_PT_BB_BS_SB_SS[iHisto][jHisto]    ->GetYaxis()->SetTitleOffset(1.5);
+            hREC_2D_in_PT[iHisto][jHisto]    = new TH2F (hName,hTitle,nBinIM2D,fArrIM2D,nBinIM2D,fArrIM2D);
+            SetAxis(hREC_2D_in_PT[iHisto][jHisto],"IM 2D");
         }
     }
     
@@ -115,15 +115,50 @@ void Anls_DataPreProcessing ( const char * fFileName )
     //  Filling output objects //
     //-------------------------//
     
-    // Evaluating entries
-    Int_t nEntries = PTreeKSig->GetEntries();
+    // Evaluating entries and saving them for later
+    Int_t nEntries = TPhiCandidate->GetEntries();
+    hUtlEntry     ->SetBinContent(1,nEntries);
+    
+    // Starting cycle
     for ( Int_t iEvent = 0; iEvent < nEntries; iEvent++ )
     {
         // Recovering events
-        PTreeKSig->GetEntry(iEvent);
+        TPhiCandidate->GetEntry(iEvent);
+        TLorentzVector  LPhi_candidate1,    LPhi_candidate2;
+        U_nAccept = 0;
         
-        for ( Int_t iPhi = 0; iPhi < evKaonSig.nKaonCouple; iPhi++ )
+        for ( Int_t iPhi = 0; iPhi < evPhiCandidate.nPhi; iPhi++ )
         {
+            LPhi_candidate1.SetXYZM(evPhiCandidate.Px[iPhi],evPhiCandidate.Py[iPhi],evPhiCandidate.Pz[iPhi],evPhiCandidate.InvMass[iPhi]);
+            if ( !fRapidityCut ( LPhi_candidate1.Rapidity() ) ) continue;
+            if ( !fTransverseMomCut ( LPhi_candidate1.Pt() ) ) continue;
+            U_AccCand[U_nAccept] = iPhi;
+            U_nAccept++;
+        }
+        for ( Int_t iPhi = 0; iPhi < U_nAccept; iPhi++ )
+        {
+            LPhi_candidate1.SetXYZM(evPhiCandidate.Px[U_AccCand[iPhi]],evPhiCandidate.Py[U_AccCand[iPhi]],evPhiCandidate.Pz[U_AccCand[iPhi]],evPhiCandidate.InvMass[U_AccCand[iPhi]]);
+            
+            hREC_1D_in_PT[fGetBinPT1D(LPhi_candidate1.Pt())]            ->  Fill(evPhiCandidate.InvMass[U_AccCand[iPhi]]);
+            hREC_1D_in_PT_2D_bin[fGetBinPT2D(LPhi_candidate1.Pt())]     ->  Fill(evPhiCandidate.InvMass[U_AccCand[iPhi]]);
+            for ( Int_t jPhi = 0; jPhi < U_nAccept; jPhi++ )
+            {
+                LPhi_candidate2.SetXYZM(evPhiCandidate.Px[U_AccCand[jPhi]],evPhiCandidate.Py[U_AccCand[jPhi]],evPhiCandidate.Pz[U_AccCand[jPhi]],evPhiCandidate.InvMass[U_AccCand[jPhi]]);
+                
+                // Only non overlapping couples of Kaons
+                //if ( evPhiCandidate.iKaon[U_AccCand[iPhi]] == evPhiCandidate.iKaon[U_AccCand[jPhi]] ) continue;
+                //if ( evPhiCandidate.jKaon[U_AccCand[iPhi]] == evPhiCandidate.jKaon[U_AccCand[jPhi]] ) continue;
+                //if ( evPhiCandidate.iKaon[U_AccCand[iPhi]] == evPhiCandidate.jKaon[U_AccCand[jPhi]] ) continue;
+                //if ( evPhiCandidate.jKaon[U_AccCand[iPhi]] == evPhiCandidate.iKaon[U_AccCand[jPhi]] ) continue;
+                
+                hREC_2D_in_PT[fGetBinPT2D(LPhi_candidate1.Pt())][fGetBinPT2D(LPhi_candidate2.Pt())] ->  Fill(evPhiCandidate.InvMass[U_AccCand[iPhi]],evPhiCandidate.InvMass[U_AccCand[jPhi]],0.5);
+                
+                hREC_1D_in_Rap->    Fill(LPhi_candidate1.Rapidity()-LPhi_candidate2.Rapidity(),0.5);
+            }
+        }
+    }
+    
+    /*
             S_ArrpT[iPhi] = -1;
             
             // Only Physically relevant couples of Kaons
@@ -172,11 +207,8 @@ void Anls_DataPreProcessing ( const char * fFileName )
             }
         }
     }
-    
-    // Evaluating the Entries value
-    nEntries      = PTreeKSig->GetEntries();
-    hUtlEntry     ->SetBinContent(1,nEntries);
-    
+    */
+
     //--------------------------//
     //  Printing output objects //
     //--------------------------//
@@ -184,18 +216,19 @@ void Anls_DataPreProcessing ( const char * fFileName )
     TFile *outFile  =   new TFile   (fInvMasHist,"recreate");
     
     hUtlEntry->Write();
+    hREC_1D_in_Rap->Write();
     for (int iHisto = 0; iHisto < nBinPT1D; iHisto++)
     {
-        hIM_1D_Rec_PT_B_S[iHisto]   ->Write();
+        hREC_1D_in_PT[iHisto]   ->Write();
     }
     
     for (int iHisto = 0; iHisto < nBinPT2D; iHisto++)
     {
-        hIM_2D_Rec_PT_B_S[iHisto]   ->Write();
+        hREC_1D_in_PT_2D_bin[iHisto]   ->Write();
         
         for (int jHisto = 0; jHisto < nBinPT2D; jHisto++)
         {
-            hIM_2D_Rec_PT_PT_BB_BS_SB_SS[iHisto][jHisto]->Write();
+            hREC_2D_in_PT[iHisto][jHisto]->Write();
         }
     }
     

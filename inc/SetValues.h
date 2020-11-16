@@ -87,9 +87,6 @@ auto const  kSystematical2D_   =   sqrt(kSyst_SigExtr2D*kSyst_SigExtr2D + kSyst_
 auto const  kPythia1DEfficien   =   0.970;
 auto const  kPythia2DEfficien   =   0.943;
 
-// TRandom
-TRandom *   fRandomGen      =   new TRandom();
-
 auto const  fFileDTAnal     = "./result/DTFinalAnalysisResults.root";
 auto const  fFileZZ1D1D     = "./result/ZZFitResults1D-1D.root";
 auto const  fFileZZ2D1D     = "./result/ZZFitResults1D-2D.root";
@@ -105,25 +102,11 @@ auto const  fFileMC_10b     = "./result/LHC14j4b.root";
 auto const  fFileMC_10c     = "./result/LHC14j4c.root";
 auto const  fFileMC_10d     = "./result/LHC14j4d.root";
 auto const  fFileMC_10e     = "./result/LHC14j4e.root";
-auto        hName           = "Name";
-auto        hTitle          = "Title";
 auto const  bPythiaTest     = false;
 auto const  bSave           = true;
 
 // - // Physics Constants
 
-//---------------------------------------//
-//- Physics is by defualt in GeV, we    -//
-//- define some constants to evaluate   -//
-//- results in other units              -//
-//---------------------------------------//
-
-auto const  kPMas           = 1.019455; // 1.019455 ± 0.000020 GeV
-auto const  kPWid           = 0.004260; // 0.004260 ± 0.000040 GeV
-auto const  KeV             = 1e6;
-auto const  MeV             = 1e3;
-auto const  GeV             = 1;
-auto const  TeV             = 1e-3;
 
 // - // DATA
 auto const  fFileDTForm     = "./result/DTZFetched.root";
@@ -142,158 +125,5 @@ auto const  fTreeBkgName    = "BKG_Kaon_Tree";
 auto const  fFileEFPreP     = "./result/EFPreProcessed.root";
 auto const  fTreeTruName    = "TRU_Phi__Tree";
 
-// INVARIANT MASS
-//-// InvMass range Pythia MC
-const   Float_t   fMinIMMC  = 0.75;
-const   Float_t   fMaxIMMC  = 1.25;
-
-//-// InvMass range 1D
-const   Int_t     nBinIM1D  = 200;
-const   Float_t   fMinIM1D  = 0.99;
-const   Float_t   fMaxIM1D  = 1.05;
-        Float_t * fArrIM1D  = new Float_t [nBinIM1D+1];
-
-//-// InvMass range 2D
-const   Int_t     nBinIM2D  = 100;
-const   Float_t   fMinIM2D  = 0.99;
-const   Float_t   fMaxIM2D  = 1.05;
-        Float_t * fArrIM2D  = new Float_t [nBinIM2D+1];
-
-// MOMENTUM
-// pT cuts 1D
-        Int_t     nBinPT1D  = 32;
-const   Float_t   fMinPT1D  = 0.0;
-const   Float_t   fMaxPT1D  = 10.0;
-        Float_t * fArrPT1D  = new Float_t [nBinPT1D+1];
-
-// pT cuts 2D
-        Int_t     nBinPT2D  = 12;
-const   Float_t   fMinPT2D  = 0.0;
-const   Float_t   fMaxPT2D  = 10.0;
-        Float_t * fArrPT2D  = new Float_t [nBinPT2D+1];
-
-//------------------------------//
-//    VARIABLES UTILITIES       //
-//------------------------------//
-
-void    fSetBinIM1D ()
-{
-    for (int i = 0; i <= nBinIM1D; i++ )
-    {
-        fArrIM1D[i] = fMinIM1D+(i)*(fMaxIM1D - fMinIM1D)/(static_cast<Float_t>(nBinIM1D));
-    }
-}
-
-Int_t   fGetBinIM1D (Float_t input_value )
-{
-    if ( input_value > fMaxIM1D ) return -1;
-    for ( Int_t iBin = 0; iBin <= nBinIM1D; iBin++ )
-    {
-        if ( input_value <= fArrIM1D[iBin] )
-        {
-            return iBin -1;
-        }
-    }
-    return nBinIM1D-1;
-}
-
-void    fSetBinIM2D ()
-{
-    for (int i = 0; i <= nBinIM2D; i++ )
-    {
-        fArrIM2D[i] = fMinIM2D+(i)*(fMaxIM2D - fMinIM2D)/(static_cast<Float_t>(nBinIM2D));
-    }
-}
-
-Int_t   fGetBinIM2D (Float_t input_value )
-{
-    if ( input_value > fMaxIM2D ) return -1;
-    for ( Int_t iBin = 0; iBin <= nBinIM2D; iBin++ )
-    {
-        if ( input_value <= fArrIM2D[iBin] )
-        {
-            return iBin -1;
-        }
-    }
-    return nBinIM2D-1;
-}
-
-void    fSetBinPT1D ()
-{
-    fArrPT1D[0] =   0.0;
-    fArrPT1D[1] =   0.1;
-    fArrPT1D[2] =   0.2;
-    fArrPT1D[3] =   0.3;
-    fArrPT1D[4] =   0.4;
-    fArrPT1D[5] =   0.5;
-    fArrPT1D[6] =   0.6;
-    fArrPT1D[7] =   0.7;
-    fArrPT1D[8] =   0.8;
-    fArrPT1D[9] =   0.9;
-    fArrPT1D[10]=   1.0;
-    fArrPT1D[11]=   1.1;
-    fArrPT1D[12]=   1.2;
-    fArrPT1D[13]=   1.3;
-    fArrPT1D[14]=   1.4;
-    fArrPT1D[15]=   1.5;
-    fArrPT1D[16]=   1.6;
-    fArrPT1D[17]=   1.7;
-    fArrPT1D[18]=   1.8;
-    fArrPT1D[19]=   1.9;
-    fArrPT1D[20]=   2.0;
-    fArrPT1D[21]=   2.2;
-    fArrPT1D[22]=   2.4;
-    fArrPT1D[23]=   2.6;
-    fArrPT1D[24]=   2.8;
-    fArrPT1D[25]=   3.0;
-    fArrPT1D[26]=   3.5;
-    fArrPT1D[27]=   4.0;
-    fArrPT1D[28]=   4.5;
-    fArrPT1D[29]=   5.0;
-    fArrPT1D[30]=   6.0;
-    fArrPT1D[31]=   8.0;
-    fArrPT1D[32]=   10.;
-}
-
-void    fSetBinPT2D ()
-{
-    fArrPT2D[0] =   0.0;
-    fArrPT2D[1] =   0.2;
-    fArrPT2D[2] =   0.40;
-    fArrPT2D[3] =   0.68;
-    fArrPT2D[4] =   0.82;
-    fArrPT2D[5] =   0.95;
-    fArrPT2D[6] =   1.1;
-    fArrPT2D[7] =   1.3;
-    fArrPT2D[8] =   1.6;
-    fArrPT2D[9] =   2.3;
-    fArrPT2D[10] =  3.0;
-    fArrPT2D[11] =  5.0;
-    fArrPT2D[12] =  10.;
- }
-
-Int_t   fGetBinPT1D (Float_t input_value )
-{
-    for ( Int_t iBin = 0; iBin <= nBinPT1D; iBin++ )
-    {
-        if ( input_value <= fArrPT1D[iBin] )
-        {
-            return iBin -1;
-        }
-    }
-    return -1;
-}
-
-Int_t   fGetBinPT2D (Float_t input_value )
-{
-    for ( Int_t iBin = 0; iBin <= nBinPT2D; iBin++ )
-    {
-        if ( input_value <= fArrPT2D[iBin] )
-        {
-            return iBin -1;
-        }
-    }
-    return -1;
-}
 
 #endif
