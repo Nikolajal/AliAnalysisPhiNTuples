@@ -37,8 +37,6 @@ using namespace std;
 //------------------------------//
 
 // - // File Names
-
-auto const  fInvMasHist         =   "./result/InvariantMassHistograms.root";
 auto const  fEfficiHist         =   "./result/Efficiencies_MCTruth.root";
 auto const  fFitResHist         =   "./result/InvariantMassFitResultsPlots.root";
 auto const  fFitResults         =   "./result/InvariantMassFitResults.root";
