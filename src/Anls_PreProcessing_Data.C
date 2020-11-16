@@ -15,7 +15,7 @@ void Anls_PreProcessing_Data ( string fFileName = "" )
     
     //Retrieving Event data TTree
     TTree   *TPhiCandidate  =   (TTree*)insFileDT->Get(fPhiCandidate_Tree);
-    TTree   *TKaonCandidate =   (TTree*)insFileDT->Get(fKaon_Tree);
+    TTree   *TKaonCandidate =   (TTree*)insFileDT->Get(fKaonCandidate_Tree);
     
     if ( !TPhiCandidate && !TKaonCandidate )
     {
@@ -146,6 +146,7 @@ void Anls_PreProcessing_Data ( string fFileName = "" )
             
             hREC_1D_in_PT[fGetBinPT1D(LPhi_candidate1.Pt())]            ->  Fill(evPhiCandidate.InvMass[U_AccCand[iPhi]]);
             hREC_1D_in_PT_2D_bin[fGetBinPT2D(LPhi_candidate1.Pt())]     ->  Fill(evPhiCandidate.InvMass[U_AccCand[iPhi]]);
+            hREF_1D_in_Rap                                              ->  Fill(LPhi_candidate1.Rapidity());
             for ( Int_t jPhi = 0; jPhi < U_nAccept; jPhi++ )
             {
                 LPhi_candidate2.SetXYZM(evPhiCandidate.Px[U_AccCand[jPhi]],evPhiCandidate.Py[U_AccCand[jPhi]],evPhiCandidate.Pz[U_AccCand[jPhi]],evPhiCandidate.InvMass[U_AccCand[jPhi]]);
@@ -170,6 +171,7 @@ void Anls_PreProcessing_Data ( string fFileName = "" )
     TFile *outFile  =   new TFile   (fInvMasHist,"recreate");
     
     hUtlEntry->Write();
+    hREF_1D_in_Rap->Write();
     hREC_1D_in_Rap->Write();
     for (int iHisto = 0; iHisto < nBinPT1D; iHisto++)
     {
