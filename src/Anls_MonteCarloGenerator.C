@@ -66,7 +66,7 @@ int main (int argc, char *argv[])
     fKaonEfficiency->Branch     ("Px",              &evKaonEfficiency.Px,           "Px[nKaon]/F");
     fKaonEfficiency->Branch     ("Py",              &evKaonEfficiency.Py,           "Py[nKaon]/F");
     fKaonEfficiency->Branch     ("Pz",              &evKaonEfficiency.Pz,           "Pz[nKaon]/F");
-    fKaonCandidate->Branch      ("Charge",          &evKaonEfficiency.Charge,       "Charge[nKaon]/B");
+    fKaonEfficiency->Branch     ("Charge",          &evKaonEfficiency.Charge,       "Charge[nKaon]/B");
     fKaonEfficiency->Branch     ("Selection",       &evKaonEfficiency.Selection,    "Selection[nKaon]/b");
     
     // PYTHIA INITIALISATION
