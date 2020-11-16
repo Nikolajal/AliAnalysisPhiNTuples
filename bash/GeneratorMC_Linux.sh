@@ -1,6 +1,6 @@
 mkdir -p ./exe
 
-    g++ ./src/GeneratorMC.C \
+    g++ ./src/Anls_MonteCarloGenerator.C \
 	-o ./exe/GeneratorMC \
 	-std=c++11 \
 	-lpythia8 \

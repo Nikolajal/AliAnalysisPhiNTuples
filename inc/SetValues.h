@@ -37,7 +37,6 @@ using namespace std;
 //------------------------------//
 
 // - // File Names
-auto const  fEfficiHist         =   "./result/Efficiencies_MCTruth.root";
 auto const  fFitResHist         =   "./result/InvariantMassFitResultsPlots.root";
 auto const  fFitResults         =   "./result/InvariantMassFitResults.root";
 auto const  fAnlResHist         =   "./result/AnalysisResultsPlots.root";

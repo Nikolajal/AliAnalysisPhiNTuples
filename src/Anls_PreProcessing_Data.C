@@ -75,7 +75,7 @@ void Anls_PreProcessing_Data ( string fFileName = "" )
     
     hName = "hREC_1D_in_Rap";
     hTitle= "Rapidity difference for #phi meson candidates";
-    hREC_1D_in_Rap  =   new TH1F (hName,hTitle,100,-1.,1.);
+    TH1F       *hREC_1D_in_Rap  =   new TH1F (hName,hTitle,100,-1.,1.);
     
     hName = "hREF_1D_in_Rap";
     hTitle= "Rapidity distribution for #phi meson candidates";
@@ -147,6 +147,9 @@ void Anls_PreProcessing_Data ( string fFileName = "" )
             hREF_1D_in_Rap                                              ->  Fill(LPhi_candidate1.Rapidity());
             for ( Int_t jPhi = 0; jPhi < U_nAccept; jPhi++ )
             {
+                // Non equal candidates
+                if ( iPhi == jPhi ) continue;
+                
                 LPhi_candidate2.SetXYZM(evPhiCandidate.Px[U_AccCand[jPhi]],evPhiCandidate.Py[U_AccCand[jPhi]],evPhiCandidate.Pz[U_AccCand[jPhi]],evPhiCandidate.InvMass[U_AccCand[jPhi]]);
                 
                 // Only non overlapping couples of Kaons

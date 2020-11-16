@@ -4,9 +4,9 @@
 mkdir Pythia8_genev || exit 1
 
 strun=0
-nruns=1000
+nruns=100000
 njobs=16
-nevents=1000
+nevents=10000
 
 for run in $(seq $strun $(($strun + $nruns - 1))); do
 

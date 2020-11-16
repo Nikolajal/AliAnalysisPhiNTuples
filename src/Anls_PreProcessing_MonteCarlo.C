@@ -152,6 +152,10 @@ void Anls_PreProcessing_MonteCarlo ( string fFileName = "" )
     hPEff2D_2X->GetXaxis()->SetTitleOffset(1.5);
     hPEff2D_2X->GetYaxis()->SetTitleOffset(1.5);
     
+    hName = "hREC_1D_in_Rap";
+    hTitle= "Rapidity difference for #phi meson candidates";
+    TH1F       *hREC_1D_in_Rap  =   new TH1F (hName,hTitle,100,-1.,1.);
+    
     // Creating the Target Result Histogram------------------------------------------------------------------
     hName   = "MC_Results";
     hTitle  = "Multidimensional #phi production statistics";
@@ -178,41 +182,44 @@ void Anls_PreProcessing_MonteCarlo ( string fFileName = "" )
     {
         TPhiCandidate->GetEntry(iEvent);
         
-        /*
-        for (Int_t iPhi = 0; iPhi < evPhi_Tru.nPhi; iPhi++ )
+        TLorentzVector  LPhi_candidate1,    LPhi_candidate2;
+        
+        for ( Int_t iPhi = 0; iPhi < evPhiEfficiency.nPhi; iPhi++ )
         {
-            // Region of Physical interest
-            if ( !evPhi_Tru.bEta[iPhi] )  continue;
-            
+            LPhi_candidate1.SetXYZM(evPhiEfficiency.Px[iPhi],evPhiEfficiency.Py[iPhi],evPhiEfficiency.Pz[iPhi],evPhiEfficiency.InvMass[iPhi]);
+            if ( !fRapidityCut ( LPhi_candidate1.Rapidity() ) ) continue;
+
             // All True Phi                                                                 #TRU
-            hPhiTru_1D-> Fill(evPhi_Tru.pT[iPhi]);
+            hPhiTru_1D-> Fill(LPhi_candidate1.Pt());
             hUtlTarget-> Fill(1);
             
             // Only |y| < 0.5 Phi in K+- Candidates                                         #GEN
-            if ( evPhi_Tru.bKdc[iPhi] )    {hPhiGen_1D-> Fill(evPhi_Tru.pT[iPhi]);  hPhiG1D_2X ->  Fill(evPhi_Tru.pT[iPhi]); }
+            if ( evPhiEfficiency.Selection[iPhi] >= 1 )    { hPhiGen_1D-> Fill(LPhi_candidate1.Pt());  hPhiG1D_2X ->  Fill(LPhi_candidate1.Pt()); }
 
             // Only Recordable Phi in K+- Candidates                                        #REC
-            if ( evPhi_Tru.bRec[iPhi] )    {hPhiRec_1D-> Fill(evPhi_Tru.pT[iPhi]);  hPhiR1D_2X ->  Fill(evPhi_Tru.pT[iPhi]); }
+            if ( evPhiEfficiency.Selection[iPhi] >= 2 )    { hPhiRec_1D-> Fill(LPhi_candidate1.Pt());  hPhiR1D_2X ->  Fill(LPhi_candidate1.Pt()); }
             
-            for (Int_t jPhi = 0; jPhi < evPhi_Tru.nPhi; jPhi++ )
+            for ( Int_t jPhi = 0; jPhi < evPhiEfficiency.nPhi; jPhi++ )
             {
-                // Auto-correlation protection
+                // Non equal candidates
                 if ( iPhi == jPhi ) continue;
                 
-                // Region of Physical interest
-                if ( !evPhi_Tru.bEta[jPhi] ) continue;
+                LPhi_candidate2.SetXYZM(evPhiEfficiency.Px[jPhi],evPhiEfficiency.Py[jPhi],evPhiEfficiency.Pz[jPhi],evPhiEfficiency.InvMass[jPhi]);
+                if ( !fRapidityCut ( LPhi_candidate2.Rapidity() ) ) continue;
                 
                 // All True Phi                                                             #TRU
-                hPhiTru_2D-> Fill(evPhi_Tru.pT[iPhi],evPhi_Tru.pT[jPhi],0.5);
+                hPhiTru_2D-> Fill(LPhi_candidate1.Pt(),LPhi_candidate2.Pt(),0.5);
                 hUtlTarget->Fill(2,0.5);
+                
+                hREC_1D_in_Rap  ->  Fill( LPhi_candidate1.Rapidity() - LPhi_candidate2.Rapidity() , 0.5);
 
                 // Only |y| < 0.5 Phi  in K+- Candidates                                    #GEN
-                if ( evPhi_Tru.bKdc[iPhi] && evPhi_Tru.bKdc[jPhi] ) hPhiGen_2D-> Fill(evPhi_Tru.pT[iPhi],evPhi_Tru.pT[jPhi],0.5);
+                if ( evPhiEfficiency.Selection[iPhi] >= 1 && evPhiEfficiency.Selection[iPhi] >= 1 ) hPhiGen_2D-> Fill(LPhi_candidate1.Pt(),LPhi_candidate2.Pt(),0.5);
                 
                 // Only Recordable Phi in K+- Candidates                                    #REC
-                if ( evPhi_Tru.bRec[iPhi] && evPhi_Tru.bRec[jPhi] ) hPhiRec_2D-> Fill(evPhi_Tru.pT[iPhi],evPhi_Tru.pT[jPhi],0.5);
+                if ( evPhiEfficiency.Selection[iPhi] >= 2 && evPhiEfficiency.Selection[iPhi] >= 2 ) hPhiRec_2D-> Fill(LPhi_candidate1.Pt(),LPhi_candidate2.Pt(),0.5);
             }
-        }*/
+        }
     }
     
     // Evaluating the Target value
@@ -262,6 +269,7 @@ void Anls_PreProcessing_MonteCarlo ( string fFileName = "" )
     
     // Writing Histograms to Output File
     hUtlEntry       ->Write();
+    hREC_1D_in_Rap  ->Write();
     hPhiGen_1D      ->Write();
     hPhiG1D_2X      ->Write();
     hPhiGen_2D      ->Write();
