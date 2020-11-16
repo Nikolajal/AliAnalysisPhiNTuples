@@ -1,45 +1,57 @@
-#include "../inc/SetValues.h"
-// !TODO: Rebooting the selection process
+#include "../inc/AliAnalysisPhiPair.h"
+// !TODO: [INFO] About trees in input
 
-void Anls_MonteCarloPreProcessing ( const char * fFileName )
+void Anls_PreProcessing_MonteCarlo ( const char * fFileName )
 {
-    if ( !fFileName )
+    if ( fFileName == "" )
     {
-        cout << "Must Specify an input root file" << endl;
+        cout << "[WARNING] Must Specify an input root file" << endl;
+        cout << "[INFO] Usage Anls_PreProcessing_MonteCarlo(\"Root_file_name.root\")" << endl;
         return;
     }
     
     //Retrieving Event data
-    TFile *insFileMC     =   new TFile   (fFileName);
+    TFile *insFileDT        =   new TFile   (fFileName.c_str());
     
     //Retrieving Event data TTree
-    TTree *PTreePTru    =   (TTree*)insFileMC->Get(fTreeTruName);
+    TTree   *TPhiCandidate  =   (TTree*)insFileDT->Get(fPhiCandidateEff_Tree);
+    TTree   *TKaonCandidate =   (TTree*)insFileDT->Get(fKaonCandidateEff_Tree);
     
-    if ( !PTreePTru )
+    if ( !TPhiCandidate && !TKaonCandidate )
     {
         cout << "Input Data Tree not found!" << endl;
         return;
     }
-        
-    // Define some simple data structures to Set Branch Addresses
-    // Phi decay Kaon +- Couples S
-    EVPHI               evPhi_Tru;
-    if ( bPythiaTest == false )
+    /*
+    if ( !TPhiCandidate )
     {
-        PTreePTru  ->SetBranchAddress    ("nPhi",           &evPhi_Tru.nPhi);
-        PTreePTru  ->SetBranchAddress    ("bRec",           &evPhi_Tru.bRec);
-        PTreePTru  ->SetBranchAddress    ("bEta",           &evPhi_Tru.bEta);
-        PTreePTru  ->SetBranchAddress    ("bKdc",           &evPhi_Tru.bKdc);
-        PTreePTru  ->SetBranchAddress    ("pT",             &evPhi_Tru.pT);
+        cout << "[INFO] " << endl;
     }
-    else
-    {
-        PTreePTru  ->SetBranchAddress    ("evPhi.nPhi",           &evPhi_Tru.nPhi);
-        PTreePTru  ->SetBranchAddress    ("evPhi.bRec",           &evPhi_Tru.bRec);
-        PTreePTru  ->SetBranchAddress    ("evPhi.bEta",           &evPhi_Tru.bEta);
-        PTreePTru  ->SetBranchAddress    ("evPhi.bKdc",           &evPhi_Tru.bKdc);
-        PTreePTru  ->SetBranchAddress    ("evPhi.pT",             &evPhi_Tru.pT);
-    }
+    */
+    
+    // Define tree data structures
+    Struct_PhiCandidate     evPhiCandidate;
+    Struct_PhiEfficiency    evPhiEfficiency;
+    Struct_KaonCandidate    evKaonCandidate;
+    Struct_KaonEfficiency   evKaonEfficiency;
+    
+    TPhiCandidate-> SetBranchAddress    ("Multiplicity",    &evPhiCandidate.Multiplicity);
+    TPhiCandidate-> SetBranchAddress    ("nPhi",            &evPhiCandidate.nPhi);
+    TPhiCandidate-> SetBranchAddress    ("Px",              &evPhiCandidate.Px);
+    TPhiCandidate-> SetBranchAddress    ("Py",              &evPhiCandidate.Py);
+    TPhiCandidate-> SetBranchAddress    ("Pz",              &evPhiCandidate.Pz);
+    TPhiCandidate-> SetBranchAddress    ("InvMass",         &evPhiCandidate.InvMass);
+    TPhiCandidate-> SetBranchAddress    ("iKaon",           &evPhiCandidate.iKaon);
+    TPhiCandidate-> SetBranchAddress    ("jKaon",           &evPhiCandidate.jKaon);
+    
+    TKaonCandidate-> SetBranchAddress   ("Multiplicity",    &evKaonCandidate.Multiplicity);
+    TKaonCandidate-> SetBranchAddress   ("nKaon",           &evKaonCandidate.nKaon);
+    TKaonCandidate-> SetBranchAddress   ("Px",              &evKaonCandidate.Px);
+    TKaonCandidate-> SetBranchAddress   ("Py",              &evKaonCandidate.Py);
+    TKaonCandidate-> SetBranchAddress   ("Pz",              &evKaonCandidate.Pz);
+    TKaonCandidate-> SetBranchAddress   ("Charge",          &evKaonCandidate.Charge);
+    TKaonCandidate-> SetBranchAddress   ("TOFSigma",        &evKaonCandidate.SigmaTOF);
+    TKaonCandidate-> SetBranchAddress   ("TPCSigma",        &evKaonCandidate.SigmaTPC);
     
     //---------------------//
     //  Setting up output  //

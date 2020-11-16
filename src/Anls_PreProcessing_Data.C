@@ -6,7 +6,7 @@ void Anls_PreProcessing_Data ( string fFileName = "" )
     if ( fFileName == "" )
     {
         cout << "[WARNING] Must Specify an input root file" << endl;
-        cout << "[INFP] Usage Anls_PreProcessing_Data(\"Root_file_name.root\")" << endl;
+        cout << "[INFO] Usage Anls_PreProcessing_Data(\"Root_file_name.root\")" << endl;
         return;
     }
     
