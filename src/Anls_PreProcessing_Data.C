@@ -14,7 +14,7 @@ void Anls_PreProcessing_Data ( string fFileName = "" )
     TFile *insFileDT        =   new TFile   (fFileName.c_str());
     
     //Retrieving Event data TTree
-    TTree   *TPhiCandidate  =   (TTree*)insFileDT->Get(fPhiCandidateEff_Tree);
+    TTree   *TPhiCandidate  =   (TTree*)insFileDT->Get(fPhiCandidate_Tree);
     TTree   *TKaonCandidate =   (TTree*)insFileDT->Get(fKaon_Tree);
     
     if ( !TPhiCandidate && !TKaonCandidate )
@@ -69,6 +69,7 @@ void Anls_PreProcessing_Data ( string fFileName = "" )
     // 1D
     TH1F      **hREC_1D_in_PT               = new TH1F     *[nBinPT1D];
     TH1F       *hREC_1D_in_Rap;
+    TH1F       *hREF_1D_in_Rap;
     
     // 2D
     TH1F      **hREC_1D_in_PT_2D_bin        = new TH1F     *[nBinPT2D];
@@ -77,6 +78,10 @@ void Anls_PreProcessing_Data ( string fFileName = "" )
     hName = "hREC_1D_in_Rap";
     hTitle= "Rapidity difference for #phi meson candidates";
     hREC_1D_in_Rap  =   new TH1F (hName,hTitle,100,-1.,1.);
+    
+    hName = "hREF_1D_in_Rap";
+    hTitle= "Rapidity distribution for #phi meson candidates";
+    hREF_1D_in_Rap  =   new TH1F (hName,hTitle,100,-.5,.5);
     
     for ( Int_t iHisto = 0; iHisto < nBinPT1D; iHisto++ )
     {
@@ -146,10 +151,10 @@ void Anls_PreProcessing_Data ( string fFileName = "" )
                 LPhi_candidate2.SetXYZM(evPhiCandidate.Px[U_AccCand[jPhi]],evPhiCandidate.Py[U_AccCand[jPhi]],evPhiCandidate.Pz[U_AccCand[jPhi]],evPhiCandidate.InvMass[U_AccCand[jPhi]]);
                 
                 // Only non overlapping couples of Kaons
-                //if ( evPhiCandidate.iKaon[U_AccCand[iPhi]] == evPhiCandidate.iKaon[U_AccCand[jPhi]] ) continue;
-                //if ( evPhiCandidate.jKaon[U_AccCand[iPhi]] == evPhiCandidate.jKaon[U_AccCand[jPhi]] ) continue;
-                //if ( evPhiCandidate.iKaon[U_AccCand[iPhi]] == evPhiCandidate.jKaon[U_AccCand[jPhi]] ) continue;
-                //if ( evPhiCandidate.jKaon[U_AccCand[iPhi]] == evPhiCandidate.iKaon[U_AccCand[jPhi]] ) continue;
+                if ( evPhiCandidate.iKaon[U_AccCand[iPhi]] == evPhiCandidate.iKaon[U_AccCand[jPhi]] ) continue;
+                if ( evPhiCandidate.jKaon[U_AccCand[iPhi]] == evPhiCandidate.jKaon[U_AccCand[jPhi]] ) continue;
+                if ( evPhiCandidate.iKaon[U_AccCand[iPhi]] == evPhiCandidate.jKaon[U_AccCand[jPhi]] ) continue;
+                if ( evPhiCandidate.jKaon[U_AccCand[iPhi]] == evPhiCandidate.iKaon[U_AccCand[jPhi]] ) continue;
                 
                 hREC_2D_in_PT[fGetBinPT2D(LPhi_candidate1.Pt())][fGetBinPT2D(LPhi_candidate2.Pt())] ->  Fill(evPhiCandidate.InvMass[U_AccCand[iPhi]],evPhiCandidate.InvMass[U_AccCand[jPhi]],0.5);
                 
@@ -157,57 +162,6 @@ void Anls_PreProcessing_Data ( string fFileName = "" )
             }
         }
     }
-    
-    /*
-            S_ArrpT[iPhi] = -1;
-            
-            // Only Physically relevant couples of Kaons
-            if ( !evKaonSig.bEta[iPhi] ) continue;
-        
-            // Only Phi couples of Kaons
-            if ( !evKaonSig.bRec[iPhi] && bPythiaTest ) continue;
-            
-            // Determining pT
-            S_ArrpT[iPhi] = fGetBinPT1D ( evKaonSig.pT[iPhi] );
-            
-            // Refusing non acceptable Couple
-            if ( S_ArrpT[iPhi] == -1 ) continue;
-            
-            // Filling 1D Histogram
-            hIM_1D_Rec_PT_B_S[S_ArrpT[iPhi]]   ->Fill(evKaonSig.InvMass[iPhi]);
-            
-            // Determining 2D Sig pT bin
-            S_ArrpT[iPhi] = fGetBinPT2D ( evKaonSig.pT[iPhi] );
-            
-            // Skipping invalid pT
-            if ( S_ArrpT[iPhi] != -1) hIM_2D_Rec_PT_B_S[S_ArrpT[iPhi]]   ->Fill(evKaonSig.InvMass[iPhi]);
-            
-        }
-        for (Int_t iPhi = 0; iPhi < evKaonSig.nKaonCouple; iPhi++ )
-        {
-            // Only acceptable couples of Kaons
-            if ( S_ArrpT[iPhi] == -1 ) continue;
-            
-            // Combinatorial mixing
-            for (Int_t jPhi = 0; jPhi < evKaonSig.nKaonCouple; jPhi++ )
-            {
-                // Auto-correlation protection
-                if ( iPhi == jPhi ) continue;
-
-                // Only acceptable couples of Kaons
-                if ( S_ArrpT[jPhi] == -1 || S_ArrpT[iPhi] == -1 ) continue;
-                
-                // Only non overlapping couples of Kaons
-                if ( evKaonSig.iKaon[iPhi] == evKaonSig.iKaon[jPhi] ) continue;
-                if ( evKaonSig.iKaon[iPhi] == evKaonSig.jKaon[jPhi] ) continue;
-                if ( evKaonSig.jKaon[iPhi] == evKaonSig.iKaon[jPhi] ) continue;
-                if ( evKaonSig.jKaon[iPhi] == evKaonSig.jKaon[jPhi] ) continue;
-                
-                hIM_2D_Rec_PT_PT_BB_BS_SB_SS[S_ArrpT[iPhi]][S_ArrpT[jPhi]]   ->Fill(evKaonSig.InvMass[iPhi],evKaonSig.InvMass[jPhi],0.5);
-            }
-        }
-    }
-    */
 
     //--------------------------//
     //  Printing output objects //
