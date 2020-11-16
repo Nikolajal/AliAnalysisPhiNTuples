@@ -41,6 +41,7 @@
 
 //-// File Names
 auto const  fInvMasHist         =   "./result/InvariantMassHistograms.root";
+auto const  fEfficiHist         =   "./result/Efficiencies_MCTruth.root";
 
 //-// Tree Names
 auto const  fPhiCandidate_Tree      =   "PhiCandidate";

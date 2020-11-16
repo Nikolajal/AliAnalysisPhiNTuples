@@ -1,7 +1,7 @@
 #include "../inc/AliAnalysisPhiPair.h"
 // !TODO: [INFO] About trees in input
 
-void Anls_PreProcessing_MonteCarlo ( const char * fFileName )
+void Anls_PreProcessing_MonteCarlo ( string fFileName = "" )
 {
     if ( fFileName == "" )
     {
@@ -11,11 +11,11 @@ void Anls_PreProcessing_MonteCarlo ( const char * fFileName )
     }
     
     //Retrieving Event data
-    TFile *insFileDT        =   new TFile   (fFileName.c_str());
+    TFile *insFileMC        =   new TFile   (fFileName.c_str());
     
     //Retrieving Event data TTree
-    TTree   *TPhiCandidate  =   (TTree*)insFileDT->Get(fPhiCandidateEff_Tree);
-    TTree   *TKaonCandidate =   (TTree*)insFileDT->Get(fKaonCandidateEff_Tree);
+    TTree   *TPhiCandidate  =   (TTree*)insFileMC->Get(fPhiCandidateEff_Tree);
+    TTree   *TKaonCandidate =   (TTree*)insFileMC->Get(fKaonCandidateEff_Tree);
     
     if ( !TPhiCandidate && !TKaonCandidate )
     {
@@ -33,23 +33,18 @@ void Anls_PreProcessing_MonteCarlo ( const char * fFileName )
     Struct_PhiEfficiency    evPhiEfficiency;
     Struct_KaonEfficiency   evKaonEfficiency;
     
-    TPhiCandidate-> SetBranchAddress    ("Multiplicity",    &evPhiCandidate.Multiplicity);
-    TPhiCandidate-> SetBranchAddress    ("nPhi",            &evPhiCandidate.nPhi);
-    TPhiCandidate-> SetBranchAddress    ("Px",              &evPhiCandidate.Px);
-    TPhiCandidate-> SetBranchAddress    ("Py",              &evPhiCandidate.Py);
-    TPhiCandidate-> SetBranchAddress    ("Pz",              &evPhiCandidate.Pz);
-    TPhiCandidate-> SetBranchAddress    ("InvMass",         &evPhiCandidate.InvMass);
-    TPhiCandidate-> SetBranchAddress    ("iKaon",           &evPhiCandidate.iKaon);
-    TPhiCandidate-> SetBranchAddress    ("jKaon",           &evPhiCandidate.jKaon);
+    TPhiCandidate-> SetBranchAddress    ("nPhi",            &evPhiEfficiency.nPhi);
+    TPhiCandidate-> SetBranchAddress    ("Px",              &evPhiEfficiency.Px);
+    TPhiCandidate-> SetBranchAddress    ("Py",              &evPhiEfficiency.Py);
+    TPhiCandidate-> SetBranchAddress    ("Pz",              &evPhiEfficiency.Pz);
+    TPhiCandidate-> SetBranchAddress    ("Selection",       &evPhiEfficiency.Selection);
     
-    TKaonCandidate-> SetBranchAddress   ("Multiplicity",    &evKaonCandidate.Multiplicity);
-    TKaonCandidate-> SetBranchAddress   ("nKaon",           &evKaonCandidate.nKaon);
-    TKaonCandidate-> SetBranchAddress   ("Px",              &evKaonCandidate.Px);
-    TKaonCandidate-> SetBranchAddress   ("Py",              &evKaonCandidate.Py);
-    TKaonCandidate-> SetBranchAddress   ("Pz",              &evKaonCandidate.Pz);
-    TKaonCandidate-> SetBranchAddress   ("Charge",          &evKaonCandidate.Charge);
-    TKaonCandidate-> SetBranchAddress   ("TOFSigma",        &evKaonCandidate.SigmaTOF);
-    TKaonCandidate-> SetBranchAddress   ("TPCSigma",        &evKaonCandidate.SigmaTPC);
+    TKaonCandidate-> SetBranchAddress   ("nKaon",           &evKaonEfficiency.nKaon);
+    TKaonCandidate-> SetBranchAddress   ("Px",              &evKaonEfficiency.Px);
+    TKaonCandidate-> SetBranchAddress   ("Py",              &evKaonEfficiency.Py);
+    TKaonCandidate-> SetBranchAddress   ("Pz",              &evKaonEfficiency.Pz);
+    TKaonCandidate-> SetBranchAddress   ("Charge",          &evKaonEfficiency.Charge);
+    TKaonCandidate-> SetBranchAddress   ("Selection",       &evKaonEfficiency.Selection);
     
     //---------------------//
     //  Setting up output  //
@@ -60,7 +55,6 @@ void Anls_PreProcessing_MonteCarlo ( const char * fFileName )
     fSetBinIM1D();
     fSetBinPT2D();
     fSetBinIM2D();
-    Int_t       S_ArrpT[1024];
     
     // Creating 1D Efficiency histograms---------------------------------------------------------------------
     hName   = "hNP_1D_Gen_PT_S";
@@ -176,10 +170,15 @@ void Anls_PreProcessing_MonteCarlo ( const char * fFileName )
     //-------------------------//
     
     // Evaluating entries
-    Int_t nEntries = PTreePTru->GetEntries();
+    Int_t nEntries  =   TPhiCandidate->GetEntries();
+    hUtlEntry       ->  SetBinContent(1,nEntries);
+    
+    // Starting cycle
     for ( Int_t iEvent = 0; iEvent < nEntries; iEvent++ )
     {
-        PTreePTru->GetEntry(iEvent);
+        TPhiCandidate->GetEntry(iEvent);
+        
+        /*
         for (Int_t iPhi = 0; iPhi < evPhi_Tru.nPhi; iPhi++ )
         {
             // Region of Physical interest
@@ -213,7 +212,7 @@ void Anls_PreProcessing_MonteCarlo ( const char * fFileName )
                 // Only Recordable Phi in K+- Candidates                                    #REC
                 if ( evPhi_Tru.bRec[iPhi] && evPhi_Tru.bRec[jPhi] ) hPhiRec_2D-> Fill(evPhi_Tru.pT[iPhi],evPhi_Tru.pT[jPhi],0.5);
             }
-        }
+        }*/
     }
     
     // Evaluating the Target value
@@ -238,31 +237,6 @@ void Anls_PreProcessing_MonteCarlo ( const char * fFileName )
     hPhiGen_2D    ->Scale(1./(nEntries));
     hPhiRec_2D    ->Scale(1./(nEntries));
     hPhiTru_2D    ->Scale(1./(nEntries));
-    
-    nEntries      = PTreePTru->GetEntries();
-    hUtlEntry     ->SetBinContent(1,nEntries);
-    
-    // Evaluating the Efficiencies
-    hName   = "1D_Eff";
-    hTitle  = "#phi acceptance in ALICE exp (|y|<5), 1D analysis";
-    TGraphAsymmErrors * gEfficiency1D   =   new TGraphAsymmErrors();
-    gEfficiency1D                       ->  SetName(hName);
-    gEfficiency1D                       ->  SetTitle(hTitle);
-    gEfficiency1D                       ->GetXaxis()    ->SetTitle("p_{T} #phi (GeV/c)");
-    gEfficiency1D                       ->GetYaxis()    ->SetTitle("#varepsilon");
-    
-    hName   = "2D_Eff";
-    hTitle  = "#phi acceptance in ALICE exp (|y|<5), 2D analysis";
-    TGraphAsymmErrors * gEfficiency2D =   new TGraphAsymmErrors();
-    gEfficiency2D                       ->  SetName(hName);
-    gEfficiency2D                       ->  SetTitle(hTitle);
-    gEfficiency2D                       ->  GetXaxis()  ->SetTitle("p_{T} #phi_{1} (GeV/c)");
-    gEfficiency2D                       ->  GetYaxis()  ->SetTitle("p_{T} #phi_{2} (GeV/c)");
-    gEfficiency2D                       ->  GetZaxis()  ->SetTitle("#varepsilon");
-    
-    gEfficiency1D->Divide(hPhiRec_1D,hPhiGen_1D,"cl=0.683 b(1,1) mode");
-    
-    gEfficiency2D->Divide(hPhiR1D_2X,hPhiG1D_2X,"cl=0.683 b(1,1) mode");
     
     // Evalutaing the Efficiencies
     hPhiEff_1D->Divide(hPhiRec_1D,hPhiGen_1D,1.,1.,"b");
@@ -300,9 +274,6 @@ void Anls_PreProcessing_MonteCarlo ( const char * fFileName )
     hPhiEff_2D      ->Write();
     hPEff2D_2X      ->Write();
     hUtlTarget      ->Write();
-    gEfficiency1D   ->Write();
-    gEfficiency2D   ->Write();
-    //(hPhiRec_1D->Divide(hPhiRec_1D,hPhiGen_1D));
     hPhiRec_1D->Write();
     
     outFile->Close();
