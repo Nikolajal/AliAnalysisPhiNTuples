@@ -45,8 +45,8 @@ auto const  fInvMasHist         =   "./result/InvariantMassHistograms.root";
 //-// Tree Names
 auto const  fPhiCandidate_Tree      =   "PhiCandidate";
 auto const  fPhiCandidateEff_Tree   =   "PhiEfficiency";
-auto const  fKaon_Tree              =   "KaonCandidate";
-auto const  fKaonEff_Tree           =   "KaonEfficiency";
+auto const  fKaonCandidate_Tree     =   "KaonCandidate";
+auto const  fKaonCandidateEff_Tree  =   "KaonEfficiency";
 
 //-// InvMass range Pythia MC
 const   Float_t   fMinIMMC  =   0.75;
