@@ -18,6 +18,8 @@
 #include "TH3F.h"
 #include "TF1.h"
 #include "TFile.h"
+#include "TRandom.h"
+#include "TLegend.h"
 
 // RooFit
 #include "RooRealVar.h"

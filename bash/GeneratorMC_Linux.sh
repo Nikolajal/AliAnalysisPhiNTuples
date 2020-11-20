@@ -1,7 +1,7 @@
 mkdir -p ./exe
 
     g++ ./src/Anls_MonteCarloGenerator.C \
-	-o ./exe/GeneratorMC \
+	-o ./exe/Anls_MonteCarloGenerator \
 	-std=c++11 \
 	-lpythia8 \
 	-L$PYTHIA8/lib/ \
