@@ -65,21 +65,31 @@ void Anls_PreProcessing_Data ( string fFileName = "" )
     
     // Creating the histograms-------------------------------------------------------------------------------
     // 1D
+    TH1F       *hREC_1D;
     TH1F      **hREC_1D_in_PT               = new TH1F     *[nBinPT1D];
     TH1F       *hREC_1D_in_Rap;
     TH1F       *hREF_1D_in_Rap;
     
     // 2D
+    TH2F       *hREC_2D;
     TH1F      **hREC_1D_in_PT_2D_bin        = new TH1F     *[nBinPT2D];
     TH2F     ***hREC_2D_in_PT               = new TH2F    **[nBinPT2D];
     
     hName = "hREC_1D_in_Rap";
     hTitle= "Rapidity difference for #phi meson candidates";
-    TH1F       *hREC_1D_in_Rap  =   new TH1F (hName,hTitle,100,-1.,1.);
+    hREC_1D_in_Rap  =   new TH1F (hName,hTitle,100,-1.,1.);
     
     hName = "hREF_1D_in_Rap";
     hTitle= "Rapidity distribution for #phi meson candidates";
     hREF_1D_in_Rap  =   new TH1F (hName,hTitle,100,-.5,.5);
+    
+    hName = "hREC_1D";
+    hTitle= "--";
+    hREC_1D  =   new TH1F (hName,hTitle,nBinPT1D,fArrPT1D);
+    
+    hName = "hREC_2D";
+    hTitle= "--";
+    hREC_2D  =   new TH2F (hName,hTitle,nBinPT2D,fArrPT2D,nBinPT2D,fArrPT2D);
     
     for ( Int_t iHisto = 0; iHisto < nBinPT1D; iHisto++ )
     {
@@ -142,6 +152,7 @@ void Anls_PreProcessing_Data ( string fFileName = "" )
         {
             LPhi_candidate1.SetXYZM(evPhiCandidate.Px[U_AccCand[iPhi]],evPhiCandidate.Py[U_AccCand[iPhi]],evPhiCandidate.Pz[U_AccCand[iPhi]],evPhiCandidate.InvMass[U_AccCand[iPhi]]);
             
+            hREC_1D                                                     ->  Fill(evPhiCandidate.InvMass[iPhi]);
             hREC_1D_in_PT[fGetBinPT1D(LPhi_candidate1.Pt())]            ->  Fill(evPhiCandidate.InvMass[U_AccCand[iPhi]]);
             hREC_1D_in_PT_2D_bin[fGetBinPT2D(LPhi_candidate1.Pt())]     ->  Fill(evPhiCandidate.InvMass[U_AccCand[iPhi]]);
             hREF_1D_in_Rap                                              ->  Fill(LPhi_candidate1.Rapidity());
@@ -159,6 +170,7 @@ void Anls_PreProcessing_Data ( string fFileName = "" )
                 if ( evPhiCandidate.jKaon[U_AccCand[iPhi]] == evPhiCandidate.iKaon[U_AccCand[jPhi]] ) continue;
                 
                 hREC_2D_in_PT[fGetBinPT2D(LPhi_candidate1.Pt())][fGetBinPT2D(LPhi_candidate2.Pt())] ->  Fill(evPhiCandidate.InvMass[U_AccCand[iPhi]],evPhiCandidate.InvMass[U_AccCand[jPhi]],0.5);
+                hREC_2D                                                                             ->  Fill(evPhiCandidate.InvMass[U_AccCand[iPhi]],evPhiCandidate.InvMass[U_AccCand[jPhi]],0.5);
                 
                 hREC_1D_in_Rap->    Fill(LPhi_candidate1.Rapidity()-LPhi_candidate2.Rapidity(),0.5);
             }
@@ -174,6 +186,8 @@ void Anls_PreProcessing_Data ( string fFileName = "" )
     hUtlEntry->Write();
     hREF_1D_in_Rap->Write();
     hREC_1D_in_Rap->Write();
+    hREC_1D->Write();
+    hREC_2D->Write();
     for (int iHisto = 0; iHisto < nBinPT1D; iHisto++)
     {
         hREC_1D_in_PT[iHisto]   ->Write();

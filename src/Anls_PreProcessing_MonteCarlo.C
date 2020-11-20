@@ -154,7 +154,16 @@ void Anls_PreProcessing_MonteCarlo ( string fFileName = "" )
     
     hName = "hREC_1D_in_Rap";
     hTitle= "Rapidity difference for #phi meson candidates";
-    TH1F       *hREC_1D_in_Rap  =   new TH1F (hName,hTitle,100,-1.,1.);
+    TH1F       *hREC_1D_in_Rap  =   new TH1F (hName,hTitle,160,-.3,.3);
+    hName = "hREC_1D_in_Rap1";
+    hTitle= "Rapidity difference for #phi meson candidates";
+    TH1F       *hREC_1D_in_Rap1  =   new TH1F (hName,hTitle,130,-.3,.3);
+    hName = "hREC_1D_in_Rap2";
+    hTitle= "Rapidity difference for #phi meson candidates";
+    TH1F       *hREC_1D_in_Rap2  =   new TH1F (hName,hTitle,100,-.3,.3);
+    hName = "hREC_1D_in_Rap3";
+    hTitle= "Rapidity difference for #phi meson candidates";
+    TH1F       *hREC_1D_in_Rap3  =   new TH1F (hName,hTitle,70,-.3,.3);
     
     // Creating the Target Result Histogram------------------------------------------------------------------
     hName   = "MC_Results";
@@ -186,7 +195,7 @@ void Anls_PreProcessing_MonteCarlo ( string fFileName = "" )
         
         for ( Int_t iPhi = 0; iPhi < evPhiEfficiency.nPhi; iPhi++ )
         {
-            LPhi_candidate1.SetXYZM(evPhiEfficiency.Px[iPhi],evPhiEfficiency.Py[iPhi],evPhiEfficiency.Pz[iPhi],evPhiEfficiency.InvMass[iPhi]);
+            LPhi_candidate1.SetXYZM(evPhiEfficiency.Px[iPhi],evPhiEfficiency.Py[iPhi],evPhiEfficiency.Pz[iPhi],kPMas);
             if ( !fRapidityCut ( LPhi_candidate1.Rapidity() ) ) continue;
 
             // All True Phi                                                                 #TRU
@@ -204,20 +213,24 @@ void Anls_PreProcessing_MonteCarlo ( string fFileName = "" )
                 // Non equal candidates
                 if ( iPhi == jPhi ) continue;
                 
-                LPhi_candidate2.SetXYZM(evPhiEfficiency.Px[jPhi],evPhiEfficiency.Py[jPhi],evPhiEfficiency.Pz[jPhi],evPhiEfficiency.InvMass[jPhi]);
+                LPhi_candidate2.SetXYZM(evPhiEfficiency.Px[jPhi],evPhiEfficiency.Py[jPhi],evPhiEfficiency.Pz[jPhi],kPMas);
                 if ( !fRapidityCut ( LPhi_candidate2.Rapidity() ) ) continue;
                 
                 // All True Phi                                                             #TRU
                 hPhiTru_2D-> Fill(LPhi_candidate1.Pt(),LPhi_candidate2.Pt(),0.5);
                 hUtlTarget->Fill(2,0.5);
-                
-                hREC_1D_in_Rap  ->  Fill( LPhi_candidate1.Rapidity() - LPhi_candidate2.Rapidity() , 0.5);
 
                 // Only |y| < 0.5 Phi  in K+- Candidates                                    #GEN
                 if ( evPhiEfficiency.Selection[iPhi] >= 1 && evPhiEfficiency.Selection[iPhi] >= 1 ) hPhiGen_2D-> Fill(LPhi_candidate1.Pt(),LPhi_candidate2.Pt(),0.5);
                 
                 // Only Recordable Phi in K+- Candidates                                    #REC
                 if ( evPhiEfficiency.Selection[iPhi] >= 2 && evPhiEfficiency.Selection[iPhi] >= 2 ) hPhiRec_2D-> Fill(LPhi_candidate1.Pt(),LPhi_candidate2.Pt(),0.5);
+                
+                if ( jPhi < iPhi ) continue;
+                hREC_1D_in_Rap  ->  Fill( LPhi_candidate1.Rapidity() - LPhi_candidate2.Rapidity() );
+                hREC_1D_in_Rap1  ->  Fill( LPhi_candidate1.Rapidity() - LPhi_candidate2.Rapidity() );
+                hREC_1D_in_Rap2  ->  Fill( LPhi_candidate1.Rapidity() - LPhi_candidate2.Rapidity() );
+                hREC_1D_in_Rap3  ->  Fill( LPhi_candidate1.Rapidity() - LPhi_candidate2.Rapidity() );
             }
         }
     }
@@ -270,6 +283,9 @@ void Anls_PreProcessing_MonteCarlo ( string fFileName = "" )
     // Writing Histograms to Output File
     hUtlEntry       ->Write();
     hREC_1D_in_Rap  ->Write();
+    hREC_1D_in_Rap1  ->Write();
+    hREC_1D_in_Rap2  ->Write();
+    hREC_1D_in_Rap3  ->Write();
     hPhiGen_1D      ->Write();
     hPhiG1D_2X      ->Write();
     hPhiGen_2D      ->Write();

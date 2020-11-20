@@ -28,7 +28,7 @@ Tclass*         AddSystematics              ( Tclass* aTarget, string aOption = 
 }
 
 template <class Tclass>    
-Tclass*         AddSystematics              ( Tclass* aTarget, Tclass* aTarge2 )
+Tclass*         AddErrors                   ( Tclass* aTarget, Tclass* aTarge2 )
 {
     Tclass*     fReturn     =   new Tclass  (*aTarget);
     for ( Int_t iBin = 1; iBin <= aTarget->GetNbinsX(); iBin++ )
@@ -739,112 +739,6 @@ TH1D*           GenResultHistogram          ( Double_t***   aInput, string aOpti
 // --------- //
 
 // Color Style and Width, Fill Marker Line
-Int_t kColor[] = {38,kBlue,kBlue+3,46,38};
-Int_t kStyle[] = {26,9,10,25,22};
-Int_t kWidth[] = {1,3,3,1,1};
-
-int             fLegendSelect       ( string fOption )
-{
-    if ( !fOption.compare("InvMass1D") )   return 1;
-    if ( !fOption.compare("xInvMass2D") )  return 2;
-    if ( !fOption.compare("yInvMass2D") )  return 2;
-    else return -1;
-}
-
-void            fLegendMaker        ( RooPlot * fRooPlot, const char * fSelect, TLegend * fLegend )
-{
-    switch (fLegendSelect(fSelect))
-    {
-        case 1:
-            fLegend                     ->SetFillColor(kWhite);
-            fLegend                     ->SetLineColor(kWhite);
-            fLegend                     ->AddEntry(fRooPlot->findObject("RooData"), "Data",                 "EP");
-            fLegend                     ->AddEntry(fRooPlot->findObject("RooSS"),   "Fit (Sig)",            "L");
-            fLegend                     ->AddEntry(fRooPlot->findObject("RooBB"),   "Fit (Bkg)",            "L");
-            fLegend                     ->AddEntry(fRooPlot->findObject("RooMod"),  "Fit (Model)",          "L");
-            break;
-        case 2:
-            fLegend                     ->SetFillColor(kWhite);
-            fLegend                     ->SetLineColor(kWhite);
-            fLegend                     ->AddEntry(fRooPlot->findObject("RooData"), "Data",                 "EP");
-            fLegend                     ->AddEntry(fRooPlot->findObject("RooSS"),   "Fit (Sig #times Sig)", "L");
-            fLegend                     ->AddEntry(fRooPlot->findObject("RooBS"),   "Fit (Bkg #times Sig)", "L");
-            fLegend                     ->AddEntry(fRooPlot->findObject("RooSB"),   "Fit (Sig #times Bkg)", "L");
-            fLegend                     ->AddEntry(fRooPlot->findObject("RooBB"),   "Fit (Bkg #times Bkg)", "L");
-            fLegend                     ->AddEntry(fRooPlot->findObject("RooMod"),  "Fit (Model)",          "L");
-            break;
-        default:
-            cout << "Improper option, no changes made" << endl;
-            break;
-    }
-}
-
-int             fAxisSelect         ( string fOption )
-{
-    if ( !fOption.compare("InvMass1D") )   return 1;
-    if ( !fOption.compare("xInvMass2D") )  return 2;
-    if ( !fOption.compare("yInvMass2D") )  return 3;
-    else return -1;
-}
- 
-void            fAxisMaker          ( RooPlot * fRooPlot, const char * fSelect )
-{
-    switch (fAxisSelect(fSelect))
-    {
-        case 1:
-            fRooPlot                    ->GetXaxis()->SetTitle("m_{K^{+}K^{-}} (GeV/c^{2})");
-            break;
-        case 2:
-            fRooPlot                    ->GetXaxis()->SetTitle("m^{x}_{K^{+}K^{-}} (GeV/c^{2})");
-            break;
-        case 3:
-            fRooPlot                    ->GetXaxis()->SetTitle("m^{y}_{K^{+}K^{-}} (GeV/c^{2})");
-            break;
-        default:
-            cout << "Improper option, no changes made" << endl;
-            break;
-    }
-}
-
-int             fPlotterSelect      ( string fOption )
-{
-    if ( !fOption.compare("InvMass1D") )   return 1;
-    if ( !fOption.compare("xInvMass2D") )  return 2;
-    if ( !fOption.compare("yInvMass2D") )  return 2;
-    else return -1;
-}
-
-void            fRooPlotPlotter     ( RooPlot * fRooPlot, const char * fSelect, RooAddPdf fModel , RooDataHist * fData )
-{
-    switch (fPlotterSelect(fSelect))
-    {
-        case 1:
-            fData                           ->plotOn(fRooPlot,      MarkerColor(38),                MarkerStyle(26),    Name("RooData"));
-            fModel                          .plotOn (fRooPlot,      LineColor(4),                   LineStyle(kDashed), Name("RooMod"));
-            fModel                          .plotOn (fRooPlot,      Components("fBkg"),             LineStyle(kDashed), LineColor(38),      Name("RooBB"));
-            fModel                          .plotOn (fRooPlot,      Components("fSig"),             LineColor(2),       Name("RooSS"));
-            break;
-        case 2:
-            fData                           ->plotOn(fRooPlot,      CutRange("fDrawRange"),         MarkerColor(38),    MarkerStyle(26) ,   Name("RooData"));
-            fModel                          .plotOn (fRooPlot,      ProjectionRange("fDrawRange"),  LineColor(4),       LineStyle(kDashed), Name("RooMod"));
-            fModel                          .plotOn (fRooPlot,      ProjectionRange("fDrawRange"),  Components("fBkg"), LineStyle(kDashed), LineColor(38),      Name("RooBB"));
-            fModel                      .plotOn (fRooPlot,      ProjectionRange("fDrawRange"),  Components("fSigSig"),LineColor(2),       Name("RooSS"));
-            fModel                      .plotOn (fRooPlot,      ProjectionRange("fDrawRange"),  Components("fSigBkg"),LineStyle(kDashed), LineColor(33),    Name("RooSB"));
-            fModel                      .plotOn (fRooPlot,      ProjectionRange("fDrawRange"),  Components("fBkgSig"),LineStyle(kDashed), LineColor(36),    Name("RooBS"));
-            break;
-        default:
-            cout << "Improper option, no changes made" << endl;
-            break;
-    }
-}
-
-void            fRooPlotMaker       ( RooPlot * fRooPlot, TLegend * fLegend, RooAddPdf fModel , RooDataHist * fData, const char * fSelect )
-{
-    fRooPlotPlotter(fRooPlot,fSelect,fModel,fData);
-    fLegendMaker(fRooPlot,fSelect,fLegend);
-    fAxisMaker(fRooPlot,fSelect);
-}
-
 void            setMarker           ( TH1F * hTarget, Int_t iType = 0 )
 {
     hTarget->SetMarkerColor(kColor[iType]);

@@ -4,9 +4,12 @@
 mkdir Pythia8_genev || exit 1
 
 strun=0
-nruns=100000
+nruns=10000
 njobs=16
-nevents=10000
+nevents=100000
+nTotal=1000000000
+
+echo "[INFO] Starting production in Pythia8 with $nTotal events in $nruns runs"
 
 for run in $(seq $strun $(($strun + $nruns - 1))); do
 
@@ -25,7 +28,7 @@ for run in $(seq $strun $(($strun + $nruns - 1))); do
     
     echo "[INFO] Starting run: $runid"
 
-    ./exe/Anls_MonteCarloGenerator Pythia8_genev/outGeneratorMC_$runid $nevents >& /dev/null & #&& \
+    ./exe/Anls_MonteCarloGenerator Pythia8_genev/outGeneratorMC_$runid $nevents $seed >& /dev/null & #&& \
 	#./dropbox_uploader.sh upload result/outGeneratorMC_$runid.root Rubini/. && \
 	#rm -rf result/outGeneratorMC_$runid.root &
 

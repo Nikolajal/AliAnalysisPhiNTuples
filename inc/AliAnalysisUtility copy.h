@@ -11,37 +11,24 @@
 #include <algorithm>
 #include <chrono>
 
-// ROOT
+// ROOT // Trees
 #include "TTree.h"
+#include "TLorentzVector.h"
+
+// ROOT // Histograms
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TH3F.h"
+
+// ROOT // Functions
 #include "TF1.h"
+
+// ROOT // Graphs
+#include "TGraphErrors.h"
+
+// ROOT // I/O
 #include "TFile.h"
-
-// RooFit
-#include "RooRealVar.h"
-#include "RooConstVar.h"
-#include "RooAddPdf.h"
-#include "RooDataSet.h"
-#include "RooAbsData.h"
-#include "RooDataHist.h"
-#include "RooPlot.h"
-#include "RooGlobalFunc.h"
-#include "RooMsgService.h"
-
-// RooFitFunction
-#include "RooChebychev.h"
-#include "RooArgusBG.h"
-#include "RooBreitWigner.h"
-#include "RooExponential.h"
-#include "RooVoigtian.h"
-#include "RooGaussian.h"
-#include "RooGenericPdf.h"
-#include "RooUniform.h"
-
-using namespace std;
-using namespace RooFit;
+#include "TRandom.h"
 
 //------------------------------//
 //      GLOBAL VARIABLES        //

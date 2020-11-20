@@ -8,10 +8,10 @@
 int main (int argc, char *argv[])
 {
     // Check everything is good
-    if (argc < 3)
+    if (argc < 4)
     {
         cout << "ERROR: Insufficient parameters given!" << endl;
-        cout << "Please use as: ./GeneratorMC [filename] [nevents]" << endl;
+        cout << "Please use as: ./GeneratorMC [filename] [nevents] [seed]" << endl;
         return -1;
     }
     
@@ -78,7 +78,7 @@ int main (int argc, char *argv[])
     pythia.readString(Form("333:mMin = %f",fMinIMMC));
     pythia.readString(Form("333:mMax = %f",fMaxIMMC));
     pythia.readString("Random:setSeed = on");
-    pythia.readString("Random:seed = 0");
+    pythia.readString(Form("Random:seed = %i",atoi(argv[3])));
     pythia.init();
     
     // Save the ID of kaons here

@@ -1,44 +1,43 @@
 // File for 1,2-Dimensional Fit:
 // !TODO: All Set!
 
-#include "../inc/SetValues.h"
-#include "../inc/SetFunctions.h"
+#include "../inc/AliAnalysisPhiPair.h"
 
 void Anls_InvariantMassFit ( bool fSilent = false )
 {
-    //---------------------//
-    //  Setting up input   //-------------------------------------------------------------------------------
-    //---------------------//
-    
     //-// OPTIONS
     
     // Silencing warnings for smoother 
     if ( fSilent )
     {
         RooMsgService::instance().setGlobalKillBelow(RooFit::ERROR);
-        RooMsgService::instance().setSilentMode(fSilent);
+        RooMsgService::instance().setSilentMode(kTRUE);
     }
     
+    //---------------------//
+    //  Setting up input   //-------------------------------------------------------------------------------
+    //---------------------//
+    
     // Opening Data File
-    TFile*  insFile_DT              =   new TFile   (fInvMasHist);
+    TFile      *insFile_DT              =   new TFile   (fInvMasHist);
     
     //-// Recovering Data histograms
-    
-    // Generating local Histograms to work on
-    TH1F *          Entry_DT            = new TH1F          ();
-    TH1F **         hIM_1D_Rec_PT_S     = new TH1F *        [nBinPT1D];
-    TH1F **         hdM_dpT_Tot_Rec     = new TH1F *        [nBinPT2D];
-    TH2F ***        hdM_dpT_Tot_Rec2D   = new TH2F **       [nBinPT2D];
+    // 1D
+    TH1F       *hREC_1D                 =   (TH1F*)(insFile_DT->Get("hREC_1D"));
+    TH1F      **hREC_1D_in_PT           =   new TH1F     *[nBinPT1D];
+    TH1F       *Entry_DT                =   (TH1F*)(insFile_DT->Get("Entry_DT"));
+
+    // 2D
+    TH2F       *hREC_2D                 =   (TH1F*)(insFile_DT->Get("hREC_2D"));
+    TH1F      **hREC_1D_in_PT_2D_bin    =   new TH1F     *[nBinPT2D];
+    TH2F     ***hREC_2D_in_PT           =   new TH2F    **[nBinPT2D];
     
     //------ 1D Histograms Recovery ------//
     
-    hName = "Entry_DT";
-    Entry_DT    =   (TH1F*)(insFile_DT->Get(hName));
-    
     for ( Int_t iHisto = 0; iHisto < nBinPT1D; iHisto++)
     {
-        hName                       =   Form("hIM_1D_Rec_PT_B_S_%i",iHisto);    // Name of the histogram in the preprocessed file
-        hIM_1D_Rec_PT_S[iHisto]     =   (TH1F*)(insFile_DT->Get(hName));
+        hName                           =   Form("hREC_1D_in_PT_%i",iHisto);    // Name of the histogram in the preprocessed file
+        hREC_1D_in_PT[iHisto]           =   (TH1F*)(insFile_DT->Get(hName));
     }
     
     //------ 2D Histograms Recovery ------//
@@ -46,16 +45,17 @@ void Anls_InvariantMassFit ( bool fSilent = false )
     for (int iHisto = 0; iHisto < nBinPT2D; iHisto++)
     {
         // Importing 1D Invariant Mass Data Histograms for 2D Fit
-        hName                       =   Form("hIM_2D_Rec_PT_B_S_%i",iHisto);    // Name of the histogram in the preprocessed file
-        hdM_dpT_Tot_Rec[iHisto]     =   (TH1F*)(insFile_DT->Get(hName));
+        hName                           =   Form("hREC_1D_in_PT_2D_bin_%i",iHisto);   // Name of the histogram in the preprocessed file
+        hREC_1D_in_PT_2D_bin[iHisto]    =   (TH1F*)(insFile_DT->Get(hName));
         
         // 2D set-up
-        hdM_dpT_Tot_Rec2D[iHisto]   =   new TH2F * [nBinPT2D];
+        hREC_2D_in_PT[iHisto]           =   new TH2F * [nBinPT2D];
+        
         for (int jHisto = 0; jHisto < nBinPT2D; jHisto++)
         {
             // Importing 2D Invariant Mass Data Histograms
-            hName                               =   Form("hIM_2D_Rec_PT_PT_BB_BS_SB_SS_%i_%i",iHisto,jHisto);   // Name of the histogram in the preprocessed file
-            hdM_dpT_Tot_Rec2D[iHisto][jHisto]   =   (TH2F*)(insFile_DT->Get(hName));
+            hName                           =   Form("hREC_2D_in_PT_%i_%i",iHisto,jHisto);  // Name of the histogram in the preprocessed file
+            hREC_2D_in_PT[iHisto][jHisto]   =   (TH2F*)(insFile_DT->Get(hName));
         }
     }
     
@@ -88,11 +88,11 @@ void Anls_InvariantMassFit ( bool fSilent = false )
     //---------------------//
     
     // Output File for Fit Check
-    TFile*  outFile_FT  =   new TFile(fFitResHist,"recreate");
+    TFile*  outFile_FT          =   new TFile(fFitResHist,"recreate");
     
     // Fit Results and PlotOn object
-    RooFitResult *** Results = new RooFitResult **  [nBinPT2D];
-    RooFitResult **  utility = new RooFitResult *   [nBinPT2D];
+    RooFitResult  ***Results    =   new RooFitResult  **[nBinPT2D];
+    RooFitResult   **utility    =   new RooFitResult   *[nBinPT2D];
     
     //------ 1D Histogram of N_raw ------//
     
@@ -102,7 +102,7 @@ void Anls_InvariantMassFit ( bool fSilent = false )
         if ( fArrPT1D[iFit+1] <= 0.41 ) continue;
         
         // Fit
-        auto fResults = FitModel(hIM_1D_Rec_PT_S[iFit],"",bSave,iFit,1);        // FitModel with Save enabled will write every fit performed on a Canvas
+        auto fResults = FitModel(hREC_1D_in_PT[iFit],Form("PT=%.2i S 1D",iFit));        // FitModel with Save enabled will write every fit performed on a Canvas
         
         // Building N_Raw histogram
         auto N_Raw      = static_cast<RooRealVar*>(fResults->floatParsFinal().at(Signal));
@@ -116,9 +116,10 @@ void Anls_InvariantMassFit ( bool fSilent = false )
     for (int iFit = 0; iFit < nBinPT2D; iFit++ )
     {
         Results[iFit]   = new RooFitResult * [nBinPT2D];
-        utility[iFit]   = FitModel(hdM_dpT_Tot_Rec[iFit],"STD",bSave,iFit,2);
+        utility[iFit]   = FitModel(hREC_1D_in_PT_2D_bin[iFit],Form("PT=%.2i S 12D",iFit));
     }
     
+    /*
     // 2D Fits
     for (int iFit = 0; iFit < nBinPT2D; iFit++ )
     {
@@ -139,7 +140,7 @@ void Anls_InvariantMassFit ( bool fSilent = false )
             h2D_Raw->SetBinError        (iFit+1,jFit+1,N_Raw->getError());
         }
     }
-    
+    */
     //---------------------//
     // Output and wrap up  //-------------------------------------------------------------------------------
     //---------------------//
