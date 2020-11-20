@@ -20,7 +20,7 @@
 #include "TFile.h"
 #include "TRandom.h"
 #include "TLegend.h"
-#include "TLoretnzVector.h"
+#include "TLorentzVector.h"
 
 // RooFit
 #include "RooRealVar.h"
