@@ -1,6 +1,6 @@
 #! /bin/bash
 
-./bash/GeneratorMC.sh
+./bash/GeneratorMC_Linux.sh
 mkdir Pythia8_genev || exit 1
 
 strun=0
