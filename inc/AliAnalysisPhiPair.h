@@ -296,7 +296,7 @@ bool    fTransverseMomCut   ( Double_t  dTransverseMom )
 //------------------------------//
 //    ANALYSISI SEPCIFIC Fncs   //
 //------------------------------//
-
+/*
 Int_t kColor[] = {38,kBlue,kBlue+3,46,38};
 Int_t kStyle[] = {26,9,10,25,22};
 Int_t kWidth[] = {1,3,3,1,1};
@@ -559,7 +559,7 @@ RooFitResult*   FitModel                        ( TH1F * _h_Data, string fOption
     
     return fResult;
 }
-
+*/
 /*
 RooFitResult*   FitModel        ( TH2F * THdata, RooFitResult * fFitShapeX, RooFitResult * fFitShapeY, string fHistName = "", Bool_t fSaveToFile = false, Int_t PTindex = -1, Int_t PTjndex = -1, string fOption = "" )
 {
