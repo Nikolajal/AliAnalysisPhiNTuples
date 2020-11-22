@@ -5,7 +5,7 @@ mkdir Pythia8_genev || exit 1
 
 strun=0
 nruns=10000
-njobs=64
+njobs=100
 nevents=100000
 nTotal=1000000000
 
