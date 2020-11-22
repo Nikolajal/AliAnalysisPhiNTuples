@@ -86,6 +86,7 @@ int main (int argc, char *argv[])
     
     // Utility variables
     TLorentzVector  iKaon_p,    jKaon_p,    Phi_p;
+    Int_t           fMultiplicityCouter;
     
     // Cycling through events
     for ( int iEvent = 0; iEvent < nEvents; iEvent++ )
@@ -98,6 +99,7 @@ int main (int argc, char *argv[])
         evPhiEfficiency.nPhi    =   0;
         evKaonCandidate.nKaon   =   0;
         evKaonEfficiency.nKaon  =   0;
+        fMultiplicityCouter     =   0;
         
         // Starting cycling through event particles
         for ( int iParticle = 0; iParticle < pythia.event.size() ; iParticle++ )
@@ -152,7 +154,13 @@ int main (int argc, char *argv[])
             }
             
             //Skipping non-final particles
-            if ( !Current_Particle.isFinal() )       continue;
+            if ( !Current_Particle.isFinal() )      continue;
+            
+            //Skipping non-charged particles
+            if ( !Current_Particle.isCharged() )    continue;
+            
+            // Mutliplicity evaluation
+            fMultiplicityCouter++;
             
             // Storing Kaons
             if ( fabs(Current_Particle.id()) == 321 )
@@ -222,6 +230,11 @@ int main (int argc, char *argv[])
                 evPhiCandidate.nPhi++;
             }
         }
+        
+        // Assigning Mutliplicity
+        evPhiCandidate.Multiplicity     =   fMultiplicityCouter;
+        evKaonCandidate.Multiplicity    =   fMultiplicityCouter;
+        
         fPhiCandidate   ->Fill();
         fPhiEfficiency  ->Fill();
         fKaonCandidate  ->Fill();
