@@ -195,7 +195,7 @@ void Anls_PreProcessing_MonteCarlo ( string fFileName = "" )
         
         for ( Int_t iPhi = 0; iPhi < evPhiEfficiency.nPhi; iPhi++ )
         {
-            LPhi_candidate1.SetXYZM(evPhiEfficiency.Px[iPhi],evPhiEfficiency.Py[iPhi],evPhiEfficiency.Pz[iPhi],kPMas);
+            LPhi_candidate1.SetXYZM(evPhiEfficiency.Px[iPhi],evPhiEfficiency.Py[iPhi],evPhiEfficiency.Pz[iPhi],kParticleMass_);
             if ( !fRapidityCut ( LPhi_candidate1.Rapidity() ) ) continue;
 
             // All True Phi                                                                 #TRU
@@ -213,7 +213,7 @@ void Anls_PreProcessing_MonteCarlo ( string fFileName = "" )
                 // Non equal candidates
                 if ( iPhi == jPhi ) continue;
                 
-                LPhi_candidate2.SetXYZM(evPhiEfficiency.Px[jPhi],evPhiEfficiency.Py[jPhi],evPhiEfficiency.Pz[jPhi],kPMas);
+                LPhi_candidate2.SetXYZM(evPhiEfficiency.Px[jPhi],evPhiEfficiency.Py[jPhi],evPhiEfficiency.Pz[jPhi],kParticleMass_);
                 if ( !fRapidityCut ( LPhi_candidate2.Rapidity() ) ) continue;
                 
                 // All True Phi                                                             #TRU

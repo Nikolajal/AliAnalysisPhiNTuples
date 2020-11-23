@@ -18,11 +18,11 @@ auto const  bPythiaTest             =   kTRUE;
 //-// File Names
 auto const  fInvMasHist             =   "./result/InvariantMassHistograms.root";
 auto const  fEfficiHist             =   "./result/Efficiencies_MCTruth.root";
-auto const  fFitResHist         =   "./result/InvariantMassFitResultsPlots.root";
-auto const  fFitResults         =   "./result/InvariantMassFitResults.root";
-auto const  fAnlResHist         =   "./result/AnalysisResultsPlots.root";
-auto const  fAnlResults         =   "./result/AnalysisResults.root";
-auto const  fSystError_         =   "./result/Syst_SigExt.root";
+auto const  fFitResHist             =   "./result/InvariantMassFitResultsPlots.root";
+auto const  fFitResults             =   "./result/InvariantMassFitResults.root";
+auto const  fAnlResHist             =   "./result/AnalysisResultsPlots.root";
+auto const  fAnlResults             =   "./result/AnalysisResults.root";
+auto const  fSystError_             =   "./result/Syst_SigExt.root";
 
 //-// Tree Names
 auto const  fPhiCandidate_Tree      =   "PhiCandidate";
@@ -38,29 +38,35 @@ auto const  kDetectorSlope          =   1.;
 const   Float_t   fMinIMMC  =   0.75;
 const   Float_t   fMaxIMMC  =   1.25;
 
-//-// InvMass range 1D
+//-// InvMass bins 1D
 const   Int_t     nBinIM1D  =   200;
 const   Float_t   fMinIM1D  =   0.99;
 const   Float_t   fMaxIM1D  =   1.05;
         Float_t  *fArrIM1D  =   new Float_t [nBinIM1D+1];
 
-//-// InvMass range 2D
+//-// InvMass bins 2D
 const   Int_t     nBinIM2D  =   100;
 const   Float_t   fMinIM2D  =   0.99;
 const   Float_t   fMaxIM2D  =   1.05;
         Float_t  *fArrIM2D  =   new Float_t [nBinIM2D+1];
 
-//-// pT cuts 1D
-        Int_t     nBinPT1D  =   32;
+//-// pT bins 1D
+const   Int_t     nBinPT1D  =   32;
 const   Float_t   fMinPT1D  =   0.0;
 const   Float_t   fMaxPT1D  =   10.0;
         Float_t  *fArrPT1D  =   new Float_t [nBinPT1D+1];
 
-//-// pT cuts 2D
-        Int_t     nBinPT2D  =   12;
+//-// pT bins 2D
+const   Int_t     nBinPT2D  =   12;
 const   Float_t   fMinPT2D  =   0.0;
 const   Float_t   fMaxPT2D  =   10.0;
         Float_t  *fArrPT2D  =   new Float_t [nBinPT2D+1];
+
+//-// Muliplicity bins
+const   Int_t     nBinMult  =   10;
+const   Float_t   fMinMult  =   0.0;
+const   Float_t   fMaxMult  =   500.0;
+        Float_t  *fArrMult  =   new Float_t [nBinPT2D+1];
 
 // Data Structures
 
@@ -150,20 +156,35 @@ void    fSetBinPT1D ()
 
 void    fSetBinPT2D ()
 {
-    fArrPT2D[0] =   0.0;
-    fArrPT2D[1] =   0.2;
-    fArrPT2D[2] =   0.40;
-    fArrPT2D[3] =   0.68;
-    fArrPT2D[4] =   0.82;
-    fArrPT2D[5] =   0.95;
-    fArrPT2D[6] =   1.1;
-    fArrPT2D[7] =   1.3;
-    fArrPT2D[8] =   1.6;
-    fArrPT2D[9] =   2.3;
+    fArrPT2D[0]  =  0.0;
+    fArrPT2D[1]  =  0.2;
+    fArrPT2D[2]  =  0.40;
+    fArrPT2D[3]  =  0.68;
+    fArrPT2D[4]  =  0.82;
+    fArrPT2D[5]  =  0.95;
+    fArrPT2D[6]  =  1.1;
+    fArrPT2D[7]  =  1.3;
+    fArrPT2D[8]  =  1.6;
+    fArrPT2D[9]  =  2.3;
     fArrPT2D[10] =  3.0;
     fArrPT2D[11] =  5.0;
     fArrPT2D[12] =  10.;
  }
+
+void    fSetBinMult ()
+{
+    fArrMult[0]  =  0.0;
+    fArrMult[1]  =  42.;
+    fArrMult[2]  =  46.;
+    fArrMult[3]  =  52.;
+    fArrMult[4]  =  57.;
+    fArrMult[5]  =  72.;
+    fArrMult[6]  =  94.;
+    fArrMult[7]  =  120.;
+    fArrMult[8]  =  156.;
+    fArrMult[9]  =  208.;
+    fArrMult[10] =  500.;
+}
 
 Int_t   fGetBinIM1D (Float_t input_value )
 {
@@ -175,7 +196,7 @@ Int_t   fGetBinIM1D (Float_t input_value )
             return iBin -1;
         }
     }
-    return nBinIM1D-1;
+    return -1;
 }
 
 Int_t   fGetBinIM2D (Float_t input_value )
@@ -188,7 +209,7 @@ Int_t   fGetBinIM2D (Float_t input_value )
             return iBin -1;
         }
     }
-    return nBinIM2D-1;
+    return -1;
 }
 
 Int_t   fGetBinPT1D (Float_t input_value )
